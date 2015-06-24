@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SlavApp.WinProcessWatcher
 {
-    public class ProcessWatcher
+    public sealed class ProcessWatcher
     {
         public IWMIWatcher WatchStart(string processName, Action<DateTime> notifyAction)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SlavApp.WinProcessWatcher
 {
-    internal class WMIWatcher : IWMIWatcher
+    internal sealed class WMIWatcher : IWMIWatcher
     {
         private ManagementEventWatcher w = null;
         private Action<DateTime> notifyAction = t => { };
