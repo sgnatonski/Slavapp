@@ -45,7 +45,7 @@ namespace LinqSpecifications.Filtering
             }
         }
 
-        protected Expression<Func<T, bool>> GetPredicate<T, TType>(Expression<Func<T, TType>> expr, FilterCommand command)
+        private Expression<Func<T, bool>> GetPredicate<T, TType>(Expression<Func<T, TType>> expr, FilterCommand command)
         {
             var argParam = expr.Parameters[0];
             var val1 = Expression.Constant(Convert.ChangeType(command.Filter, typeof(TType)));
@@ -66,7 +66,6 @@ namespace LinqSpecifications.Filtering
                     e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", new Type[] { }));
                     e1 = Expression.Call(e1, typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) }), Expression.Constant(command.Filter.ToLower()));
                     break;
-
                 case FilterOperation.Contains:
                     e1 = Expression.Call(expr.Body, typeof(TType).GetMethod("ToString", new Type[] { }));
                     e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", new Type[] { }));

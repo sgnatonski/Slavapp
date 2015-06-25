@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqSpecifications.Filtering
 {
-    public class SortCommand
+    public sealed class SortCommand
     {
         public string Column { get; set; }
 
