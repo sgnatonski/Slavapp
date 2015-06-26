@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageFinder", "ImageFinder\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{2583C168-48FA-44D4-81F4-27EF4EA1086F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.ImageFinder", "SlavApp.Minion.ImageFinder\SlavApp.Minion.ImageFinder.csproj", "{D66B573E-D6C8-4E53-BE5F-014AFC647974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.Plugin", "SlavApp.Minion.Plugin\SlavApp.Minion.Plugin.csproj", "{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{2583C168-48FA-44D4-81F4-27EF4EA1086F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2583C168-48FA-44D4-81F4-27EF4EA1086F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2583C168-48FA-44D4-81F4-27EF4EA1086F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D66B573E-D6C8-4E53-BE5F-014AFC647974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66B573E-D6C8-4E53-BE5F-014AFC647974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D66B573E-D6C8-4E53-BE5F-014AFC647974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D66B573E-D6C8-4E53-BE5F-014AFC647974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
