@@ -96,6 +96,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         public IResult Run()
         {
             this.Results = new ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>>();
+            this.Results.IsNotifying = false;
             this.Current = 0;
             this.Maximum = int.MaxValue;
 
@@ -113,9 +114,13 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
 
         void a_Completed(object sender, ResultCompletionEventArgs e)
         {
-            this.Current = 0;
-            this.Maximum = int.MaxValue;
-            this.ProgressText = string.Empty;
+            Execute.BeginOnUIThread(() =>
+            {
+                this.Current = 0;
+                this.Maximum = int.MaxValue;
+                this.ProgressText = string.Empty;
+            });
+            this.Results.IsNotifying = true;
         }
 
         private void OnRunProgress(object sender, SimilarityRunEventArgs ea)
@@ -125,12 +130,15 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 this.Maximum = ea.Total;
                 this.Current++;
                 this.ProgressText = string.Format("{0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
+            });
+            if (ea.File1 != null)
+            {
                 if (!this.Results.ContainsKey(ea.File1))
                 {
                     this.Results.Add(ea.File1, new BindableCollection<SimilarityModel>());
                 }
                 this.Results[ea.File1].Add(new SimilarityModel() { Name = ea.File2, Value = ea.Value });
-            });
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
 
         public async void Execute(CoroutineExecutionContext context)
         {
-            this.Results = await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", 0.6));
+            this.Results = await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", 0.7));
             
             Completed(this, new ResultCompletionEventArgs());
         }

@@ -72,9 +72,16 @@ namespace ImageFinder
             }*/
 
             var value = pc.CalculateSimilarity(cc);
-            if (value >= minValue && OnProgress != null)
+            if (OnProgress != null)
             {
-                OnProgress(total, f, s, value);
+                if (value >= minValue)
+                {
+                    OnProgress(total, f, s, value);
+                }
+                else
+                {
+                    OnProgress(total, null, null, 0);
+                }
             }
 
             return new SimilarityResult { First = f, Second = s, Value = value };

@@ -34,11 +34,32 @@ namespace SlavApp.Minion.Plugin
         /// <summary>Event raised when a property on the collection changes.</summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private bool isNotifying;
+        public bool IsNotifying
+        {
+            get { return isNotifying; }
+            set
+            {
+                if (this.isNotifying != value)
+                {
+                    this.isNotifying = value;
+
+                    if (value == true)
+                    {
+                        NotifyObserversOfChange();
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Notifies observers of CollectionChanged or PropertyChanged of an update to the dictionary.
         /// </summary>
         private void NotifyObserversOfChange()
         {
+            if (this.IsNotifying == false)
+            {
+                return;
+            }
             var collectionHandler = CollectionChanged;
             var propertyHandler = PropertyChanged;
             if (collectionHandler != null || propertyHandler != null)
