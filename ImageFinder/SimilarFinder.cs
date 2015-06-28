@@ -1,5 +1,4 @@
-﻿using BookSleeve;
-using EyeOpen.Imaging;
+﻿using EyeOpen.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DBreeze;
+using DBreeze.Transactions;
+using DBreeze.DataTypes;
+using Newtonsoft.Json;
 
 namespace ImageFinder
 {
@@ -16,7 +19,7 @@ namespace ImageFinder
 
         public event ProgressEventHandler OnProgress;
 
-        public async Task<List<SimilarityResult>> Run(string directory, string filter, double minSimilarity)
+        public List<SimilarityResult> Run(string directory, string filter, double minSimilarity)
         {
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 
@@ -24,67 +27,77 @@ namespace ImageFinder
 
             var list = allfiles.GetPermutations(2);
 
-            using (var conn = new RedisConnection("localhost"))
+            using (var engine = new DBreezeEngine(new DBreezeConfiguration()
             {
-                await conn.Open();
+                DBreezeDataFolderName = @".\DBR1",
+                Storage = DBreezeConfiguration.eStorage.DISK
+            }))
+            {
+                DBreeze.Utils.CustomSerializator.Serializator = JsonConvert.SerializeObject;
+                DBreeze.Utils.CustomSerializator.Deserializator = JsonConvert.DeserializeObject;
 
                 var total = list.Count();
-                var results = list.AsParallel().Select(comp => GetComparisonResult(conn, comp, total, minSimilarity).Result).Where(x => x.Value >= minSimilarity).ToList();
-
+                var results = list.AsParallel().Select(comp => GetComparisonResult(engine, comp, total, minSimilarity)).Where(x => x.Value >= minSimilarity).ToList();
                 return results;
             }
         }
 
-        private async Task<SimilarityResult> GetComparisonResult(RedisConnection conn, IEnumerable<string> comp, int total, double minValue)
+        private SimilarityResult GetComparisonResult(DBreezeEngine engine, IEnumerable<string> comp, int total, double minValue)
         {
-            var f = comp.First();
-            var s = comp.Last();
-            ComparableImage pc = null;
-            var pcData = await conn.Strings.Get(1, f);
-            if (pcData == null)
+            using (var tran = engine.GetTransaction())
             {
-                pc = new ComparableImage(new FileInfo(f));
-                await conn.Strings.Set(1, f, pc.ToByteArray());
-                Debug.Write("+");
-            }
-            else
-            {
-                pc = new ComparableImage(new FileInfo(f), pcData);
-            }
+                tran.SynchronizeTables("hist");
 
-            ComparableImage cc = null;
-            var ccData = await conn.Strings.Get(1, s);
-            if (ccData == null)
-            {
-                cc = new ComparableImage(new FileInfo(s));
-                await conn.Strings.Set(1, s, cc.ToByteArray());
-                Debug.Write("+");
-            }
-            else
-            {
-                cc = new ComparableImage(new FileInfo(s), ccData);
-            }
-
-            /*if (System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 > 100 * 1024 * 1024)
-            {
-                GC.Collect();
-                Debug.WriteLine("Gc.Collect {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
-            }*/
-
-            var value = pc.CalculateSimilarity(cc);
-            if (OnProgress != null)
-            {
-                if (value >= minValue)
+                var f = comp.First();
+                var s = comp.Last();
+                ComparableImage pc = null;
+                var pcData = tran.Select<string, DbMJSON<double[][]>>("hist", f);
+                if (!pcData.Exists)
                 {
-                    OnProgress(total, f, s, value);
+                    pc = new ComparableImage(new FileInfo(f));
+                    tran.Insert("hist", f, new DbMJSON<double[][]>(pc.ToArray()));
+                    Debug.Write("+");
                 }
                 else
                 {
-                    OnProgress(total, null, null, 0);
+                    pc = new ComparableImage(new FileInfo(f), pcData.Value.Get);
                 }
-            }
 
-            return new SimilarityResult { First = f, Second = s, Value = value };
+                ComparableImage cc = null;
+                var ccData = tran.Select<string, DbMJSON<double[][]>>("hist", s);
+                if (!ccData.Exists)
+                {
+                    cc = new ComparableImage(new FileInfo(s));
+                    tran.Insert("hist", s, new DbMJSON<double[][]>(cc.ToArray()));
+                    Debug.Write("+");
+                }
+                else
+                {
+                    cc = new ComparableImage(new FileInfo(s), ccData.Value.Get);
+                }
+
+                tran.Commit();
+                /*if (System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 > 100 * 1024 * 1024)
+                {
+                    GC.Collect();
+                    Debug.WriteLine("Gc.Collect {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
+                }*/
+
+                var value = pc.CalculateSimilarity(cc);
+                if (OnProgress != null)
+                {
+                    if (value >= minValue)
+                    {
+                        OnProgress(total, f, s, value);
+                    }
+                    else
+                    {
+                        OnProgress(total, null, null, 0);
+                    }
+                }
+
+                return new SimilarityResult { First = f, Second = s, Value = value };
+            }
         }
     }
 

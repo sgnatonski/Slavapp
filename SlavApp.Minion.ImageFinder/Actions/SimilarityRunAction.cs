@@ -18,6 +18,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
         }
 
         public string DirectoryName { get; set; }
+        public double SimilarityLevel { get; set; }
         public List<SimilarityResult> Results { get; private set; }
 
         public event EventHandler<ResultCompletionEventArgs> Completed = delegate { };
@@ -25,7 +26,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
 
         public async void Execute(CoroutineExecutionContext context)
         {
-            this.Results = await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", 0.7));
+            this.Results = await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", SimilarityLevel));
             
             Completed(this, new ResultCompletionEventArgs());
         }

@@ -35,7 +35,8 @@
         </Grid.RowDefinitions>
         <TextBox Grid.Column="0" x:Name="DirectoryName"></TextBox>
         <Button Grid.Column="1" x:Name="SelectDirectory" Content="..." Style="{DynamicResource SquareButtonStyle}"></Button>
-        <Button Grid.Row="1" Grid.ColumnSpan="2" x:Name="Run" Content="Run" Style="{DynamicResource SquareButtonStyle}"></Button>
+        <Controls:NumericUpDown Grid.Row="1" Grid.Column="0" Value="{Binding SimLevel}"></Controls:NumericUpDown>
+        <Button Grid.Row="1" Grid.Column="1" x:Name="Run" Content="Run" Style="{DynamicResource SquareButtonStyle}"></Button>
         <Controls:MetroProgressBar Grid.Row="2" Grid.ColumnSpan="2" Value="{Binding Current}" Maximum="{Binding Maximum}" Height="30" />
         <TextBlock Grid.Row="3" Grid.ColumnSpan="2" x:Name="ProgressText"/>
         <ScrollViewer  Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">

@@ -26,6 +26,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.OnProgress += OnRunProgress;
 
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
+            this.SimLevel = 95;
         }
 
         private string directoryName;
@@ -72,6 +73,17 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
+        private int simLevel;
+        public int SimLevel
+        {
+            get { return simLevel; }
+            set
+            {
+                this.simLevel = value;
+                NotifyOfPropertyChange(() => SimLevel);
+            }
+        }
+
         private ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>> results;
         public ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>> Results
         {
@@ -103,6 +115,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             var a = new SimilarityRunAction(new SimilarFinder());
             a.OnProgress += OnRunProgress;
             a.DirectoryName = this.DirectoryName;
+            a.SimilarityLevel = (double)this.SimLevel / 100.0;
             a.Completed += a_Completed;
             return a;
         }

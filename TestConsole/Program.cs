@@ -13,13 +13,6 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            MainAsync().Wait();
-        }
-
-        static object lockObj = new object();
-
-        static async Task MainAsync()
-        {
             var current = 0.0;
             var sf = new SimilarFinder();
             sf.OnProgress += (total, file1, file2, v) =>
@@ -31,12 +24,14 @@ namespace TestConsole
                 }
             };
 
-            var results = await sf.Run(@"R:\APART_ALL\ZDJĘCIA EXPO", "*.jpg", 0.6);
+            var results = sf.Run(@"R:\APART_ALL\ZDJĘCIA EXPO", "*.jpg", 0.6);
 
             Console.ReadLine();
 
             //Debug.WriteLine(results.Count());
             //results.OrderByDescending(x => x.Value).ToList().ForEach(x => Debug.WriteLine("{0}\t\t{1}\t\t{2} %", Path.GetFileName(x.First), Path.GetFileName(x.Second), x.Value * 100));
         }
+
+        static object lockObj = new object();
     }
 }

@@ -51,10 +51,6 @@
             projections = new RgbProjections(values);
         }
 
-        public ComparableImage(FileInfo file, byte[] data) : this(file, FromByteArray(data))
-        {
-        }
-
         public FileInfo File
         {
             get
@@ -86,17 +82,9 @@
             return file.Name;
         }
 
-        private static double[][] FromByteArray(byte[] data)
+        public double[][] ToArray()
         {
-            var str = System.Text.Encoding.ASCII.GetString(data);
-            var r = JsonConvert.DeserializeObject<double[][]>(str);
-            return r;
-        }
-
-        public byte[] ToByteArray()
-        {
-            var array = new [] { this.Projections.HorizontalProjection, this.Projections.VerticalProjection };
-            return System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(array));
+            return new[] { this.Projections.HorizontalProjection, this.Projections.VerticalProjection };
         }
     }
 }
