@@ -46,44 +46,54 @@ namespace ImageFinder
         {
             using (var tran = engine.GetTransaction())
             {
-                tran.SynchronizeTables("hist");
-
+                tran.SynchronizeTables("comp", "hist");
+                
                 var f = comp.First();
                 var s = comp.Last();
-                ComparableImage pc = null;
-                var pcData = tran.Select<string, DbMJSON<double[][]>>("hist", f);
-                if (!pcData.Exists)
-                {
-                    pc = new ComparableImage(new FileInfo(f));
-                    tran.Insert("hist", f, new DbMJSON<double[][]>(pc.ToArray()));
-                    Debug.Write("+");
-                }
-                else
-                {
-                    pc = new ComparableImage(new FileInfo(f), pcData.Value.Get);
-                }
 
-                ComparableImage cc = null;
-                var ccData = tran.Select<string, DbMJSON<double[][]>>("hist", s);
-                if (!ccData.Exists)
+                var value = 0.0;
+                var key = string.Join(".", new[] { f, s }.OrderBy(x => x));
+
+                var compData = tran.Select<string, double>("comp", key);
+                if (!compData.Exists)
                 {
-                    cc = new ComparableImage(new FileInfo(s));
-                    tran.Insert("hist", s, new DbMJSON<double[][]>(cc.ToArray()));
-                    Debug.Write("+");
+                    ComparableImage pc = null;
+                    var pcData = tran.Select<string, DbMJSON<double[][]>>("hist", f);
+                    if (!pcData.Exists)
+                    {
+                        pc = new ComparableImage(new FileInfo(f));
+                        tran.Insert("hist", f, new DbMJSON<double[][]>(pc.ToArray()));
+                        Debug.Write("+");
+                    }
+                    else
+                    {
+                        pc = new ComparableImage(new FileInfo(f), pcData.Value.Get);
+                    }
+
+                    ComparableImage cc = null;
+                    var ccData = tran.Select<string, DbMJSON<double[][]>>("hist", s);
+                    if (!ccData.Exists)
+                    {
+                        cc = new ComparableImage(new FileInfo(s));
+                        tran.Insert("hist", s, new DbMJSON<double[][]>(cc.ToArray()));
+                        Debug.Write("+");
+                    }
+                    else
+                    {
+                        cc = new ComparableImage(new FileInfo(s), ccData.Value.Get);
+                    }
+
+                    value = pc.CalculateSimilarity(cc);
+                    tran.Insert("comp", key, value);
+                    Debug.Write(".");
                 }
                 else
                 {
-                    cc = new ComparableImage(new FileInfo(s), ccData.Value.Get);
+                    value = compData.Value;
                 }
 
                 tran.Commit();
-                /*if (System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 > 100 * 1024 * 1024)
-                {
-                    GC.Collect();
-                    Debug.WriteLine("Gc.Collect {0}", System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
-                }*/
 
-                var value = pc.CalculateSimilarity(cc);
                 if (OnProgress != null)
                 {
                     if (value >= minValue)
@@ -95,7 +105,7 @@ namespace ImageFinder
                         OnProgress(total, null, null, 0);
                     }
                 }
-
+                
                 return new SimilarityResult { First = f, Second = s, Value = value };
             }
         }
