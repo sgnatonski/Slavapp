@@ -27,6 +27,7 @@ namespace SlavApp.Minion.ViewModels
 
         public void ShowMain()
         {
+            this.pluginManager.CloseAll();
             this.CloseItem(this.ActiveItem);
         }
 

@@ -58,6 +58,12 @@ namespace SlavApp.Minion
              DisplayRootViewFor<MainWindowViewModel>();
          }
 
+         protected override void OnExit(object sender, EventArgs e)
+         {
+             ContainerInstance.GetInstance<IPluginManager>().CloseAll();
+             base.OnExit(sender, e);
+         }
+
          protected override IEnumerable<Assembly> SelectAssemblies()
          {
              return this.LoadAssemblies(Path.Combine(Environment.CurrentDirectory, "Plugins")).Concat(new[] { Assembly.GetExecutingAssembly() });

@@ -14,6 +14,7 @@ namespace SlavApp.Minion
     public sealed class PluginManager : IPluginManager
     {
         private readonly Container container;
+        private readonly List<IScreen> activePlugins = new List<IScreen>();
 
         public PluginManager(Container container)
         {
@@ -27,7 +28,19 @@ namespace SlavApp.Minion
 
         public IScreen Create(IPlugin plugin)
         {
-            return (IScreen)this.container.GetInstance(plugin.EntryViewModelType);
+            var screen = (IScreen)this.container.GetInstance(plugin.EntryViewModelType);
+            this.activePlugins.Add(screen);
+            return screen;
+        }
+
+        public void CloseAll()
+        {
+            this.activePlugins.ForEach(p =>
+            {
+                p.TryClose();
+            });
+
+            this.activePlugins.Clear();
         }
     }
 }

@@ -7,5 +7,6 @@ namespace SlavApp.Minion.Plugin
     {
         IEnumerable<IPlugin> List();
         IScreen Create(IPlugin plugin);
+        void CloseAll();
     }
 }

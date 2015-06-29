@@ -15,7 +15,7 @@ namespace TestConsole
         {
             var current = 0.0;
             var sf = new SimilarFinder();
-            sf.OnProgress += (total, file1, file2, v) =>
+            sf.OnCompareProgress += (total, file1, file2, v) =>
             {
                 //lock(lockObj)
                 {
@@ -24,7 +24,7 @@ namespace TestConsole
                 }
             };
 
-            var results = sf.Run(@"R:\APART_ALL\ZDJĘCIA EXPO", "*.jpg", 0.6);
+            sf.Run(@"R:\APART_ALL\ZDJĘCIA EXPO", "*.jpg", 0.6);
 
             Console.ReadLine();
 

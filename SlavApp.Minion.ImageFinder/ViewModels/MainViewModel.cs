@@ -23,8 +23,10 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         public MainViewModel(SimilarityRunAction sAction)
         {
             this.sAction = sAction;
-            this.sAction.OnProgress += OnRunProgress;
-
+            this.sAction.OnPrepareProgress += OnPrepareProgress;
+            this.sAction.OnCompareProgress += OnRunProgress;
+            this.sAction.Completed += a_Completed;
+            
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
             this.SimLevel = 95;
         }
@@ -62,8 +64,8 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
-        private int maximum;
-        public int Maximum
+        private long maximum;
+        public long Maximum
         {
             get { return maximum; }
             set
@@ -112,12 +114,10 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.Current = 0;
             this.Maximum = int.MaxValue;
 
-            var a = new SimilarityRunAction(new SimilarFinder());
-            a.OnProgress += OnRunProgress;
-            a.DirectoryName = this.DirectoryName;
-            a.SimilarityLevel = (double)this.SimLevel / 100.0;
-            a.Completed += a_Completed;
-            return a;
+            this.sAction.CanRun = true;
+            this.sAction.DirectoryName = this.DirectoryName;
+            this.sAction.SimilarityLevel = (double)this.SimLevel / 100.0;
+            return this.sAction;
         }
 
         public void ShowImage(string filename)
@@ -136,13 +136,27 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.Results.IsNotifying = true;
         }
 
+        private void OnPrepareProgress(object sender, PrepareEventArgs ea)
+        {
+            Execute.BeginOnUIThread(() =>
+            {
+                this.Maximum = ea.Total;
+                this.Current++;
+                this.ProgressText = string.Format("Preparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
+                if (this.Current == this.Maximum)
+                {
+                    this.Current = 0;
+                }
+            });
+        }
+
         private void OnRunProgress(object sender, SimilarityRunEventArgs ea)
         {
             Execute.BeginOnUIThread(() =>
             {
                 this.Maximum = ea.Total;
                 this.Current++;
-                this.ProgressText = string.Format("{0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
+                this.ProgressText = string.Format("Comparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
             });
             if (ea.File1 != null)
             {
@@ -152,6 +166,15 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 }
                 this.Results[ea.File1].Add(new SimilarityModel() { Name = ea.File2, Value = ea.Value });
             }
+        }
+
+        public override void CanClose(Action<bool> callback)
+        {
+            this.sAction.CanRun = false;
+            this.sAction.Completed += (sender, ea) =>
+            {
+                callback(true);
+            };
         }
     }
 }

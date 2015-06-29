@@ -14,41 +14,58 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public SimilarityRunAction(SimilarFinder simFinder)
         {
             this.simFinder = simFinder;
-            this.simFinder.OnProgress += OnRunProgress;
+            this.simFinder.OnPrepareProgress += OnPrepProgress;
+            this.simFinder.OnCompareProgress += OnRunProgress;
         }
 
         public string DirectoryName { get; set; }
         public double SimilarityLevel { get; set; }
         public List<SimilarityResult> Results { get; private set; }
+        public bool CanRun { get; set; }
 
         public event EventHandler<ResultCompletionEventArgs> Completed = delegate { };
-        public event EventHandler<SimilarityRunEventArgs> OnProgress = delegate { };
+        public event EventHandler<SimilarityRunEventArgs> OnCompareProgress = delegate { };
+        public event EventHandler<PrepareEventArgs> OnPrepareProgress = delegate { };
 
         public async void Execute(CoroutineExecutionContext context)
         {
-            this.Results = await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", SimilarityLevel));
+            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", SimilarityLevel, () => this.CanRun));
             
             Completed(this, new ResultCompletionEventArgs());
         }
 
-        private void OnRunProgress(int total, string file1, string file2, double value)
+        private void OnPrepProgress(long total)
         {
-            OnProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
+            OnPrepareProgress(this, new PrepareEventArgs(total));
+        }
+
+        private void OnRunProgress(long total, string file1, string file2, double value)
+        {
+            OnCompareProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
         }
     }
 
     public class SimilarityRunEventArgs :EventArgs
     {
-        public SimilarityRunEventArgs(int total, string file1, string file2, double value)
+        public SimilarityRunEventArgs(long total, string file1, string file2, double value)
         {
             Total = total;
             File1 = file1;
             File2 = file2;
             Value = value;
         }
-        public int Total { get; private set; }
+        public long Total { get; private set; }
         public string File1 { get; private set; }
         public string File2 { get; private set; }
         public double Value { get; private set; }
+    }
+
+    public class PrepareEventArgs : EventArgs
+    {
+        public PrepareEventArgs(long total)
+        {
+            Total = total;
+        }
+        public long Total { get; private set; }
     }
 }
