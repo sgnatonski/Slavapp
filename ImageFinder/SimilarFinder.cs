@@ -93,7 +93,7 @@ namespace ImageFinder
                                     break;
                                 }
                                 var c = list.ElementAt(i);
-                                var result = GetComparisonResult(tran, allfiles.ElementAt(c.First()), allfiles.ElementAt(c.Last()), total, minSimilarity);
+                                GetComparisonResult(tran, allfiles.ElementAt(c.First()), allfiles.ElementAt(c.Last()), total, minSimilarity);
                             }
                             tran.Commit();
                         }
@@ -106,17 +106,17 @@ namespace ImageFinder
             }
         }
 
-        private SimilarityResult GetComparisonResult(Transaction tran, string first, string second, long total, double minValue)
+        private void GetComparisonResult(Transaction tran, string first, string second, long total, double minValue)
         {
             var value = 0.0;
             var key = string.Join(".", new[] { first, second }.OrderBy(x => x));
 
             var compData = tran.Select<string, double>("comp", key);
+
             if (!compData.Exists)
             {
                 value = this.GetHistogramComparison(tran, first, second, value);
                 tran.Insert("comp", key, value);
-                Debug.Write(".");
             }
             else
             {
@@ -134,8 +134,6 @@ namespace ImageFinder
                     OnCompareProgress(total, null, null, 0);
                 }
             }
-
-            return new SimilarityResult { First = first, Second = second, Value = value };
         }
 
         private double GetHistogramComparison(Transaction tran, string first, string second, double value)
