@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SlavApp.Minion.ImageFinder.Actions
@@ -16,19 +17,27 @@ namespace SlavApp.Minion.ImageFinder.Actions
             this.simFinder = simFinder;
             this.simFinder.OnPrepareProgress += OnPrepProgress;
             this.simFinder.OnCompareProgress += OnRunProgress;
+            this.simFinder.OnInitialized += OnInitialized;
+
+            this.simFinder.Initialize();
         }
 
         public string DirectoryName { get; set; }
         public double SimilarityLevel { get; set; }
-        public List<SimilarityResult> Results { get; private set; }
         public bool CanRun { get; set; }
 
         public event EventHandler<ResultCompletionEventArgs> Completed = delegate { };
         public event EventHandler<SimilarityRunEventArgs> OnCompareProgress = delegate { };
         public event EventHandler<PrepareEventArgs> OnPrepareProgress = delegate { };
 
+        private bool initialized = false;
+
         public async void Execute(CoroutineExecutionContext context)
         {
+            while(!initialized)
+            {
+                Thread.Sleep(100);
+            }
             await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", SimilarityLevel, () => this.CanRun));
             
             Completed(this, new ResultCompletionEventArgs());
@@ -42,6 +51,11 @@ namespace SlavApp.Minion.ImageFinder.Actions
         private void OnRunProgress(long total, string file1, string file2, double value)
         {
             OnCompareProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
+        }
+
+        void OnInitialized(object sender, EventArgs e)
+        {
+            this.initialized = true;
         }
     }
 

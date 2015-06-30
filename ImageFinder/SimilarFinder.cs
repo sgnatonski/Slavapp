@@ -31,8 +31,8 @@ namespace ImageFinder
         private DBreezeEngine memoryEngine;
         public SimilarFinder()
         {
-            DBreeze.Utils.CustomSerializator.Serializator = JsonConvert.SerializeObject;
-            DBreeze.Utils.CustomSerializator.Deserializator = JsonConvert.DeserializeObject;
+            DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
+            DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = ListExtenstions.DeserializeProtobuf;
         }
 
         public delegate void CompareProgressEventHandler(long total, string file1, string file2, double value);
@@ -43,6 +43,26 @@ namespace ImageFinder
 
         public event PrepareProgressEventHandler OnPrepareProgress;
 
+        public event EventHandler OnInitialized;
+
+        public void Initialize()
+        {
+            Task.Run(() =>
+            {
+                this.memoryEngine = new DBreezeEngine(memConf);
+
+                using (var engine = new DBreezeEngine(dbConf))
+                {
+                    LoadFromDb(engine);
+                };
+
+                if (OnInitialized != null)
+                {
+                    OnInitialized(this, new EventArgs());
+                }
+            });
+        }
+
         public void Run(string directory, string filter, double minSimilarity)
         {
             this.Run(directory, filter, minSimilarity, () => true);
@@ -50,72 +70,89 @@ namespace ImageFinder
 
         public void Run(string directory, string filter, double minSimilarity, Func<bool> continueTest)
         {
-            //Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-
             var allfiles = System.IO.Directory.GetFiles(directory, filter, System.IO.SearchOption.AllDirectories);
 
             using (var engine = new DBreezeEngine(dbConf))
             {
-                this.memoryEngine = new DBreezeEngine(memConf);
+                List<ushort[]> list = null; 
 
-                LoadFromDb(engine);
-
-                allfiles.AsParallel().ForAll(f =>
+                Task.WaitAll(new[] 
                 {
-                    if (continueTest())
+                    Task.Run(() => 
                     {
-                        using (var tran = this.memoryEngine.GetTransaction())
+                        allfiles.AsParallel().ForAll(f =>
                         {
-                            GetHistogram(tran, f);
-                            tran.Commit();
-                        }
-                        OnPrepareProgress(allfiles.Length);
-                    }
+                            if (continueTest())
+                            {
+                                using (var tran = this.memoryEngine.GetTransaction())
+                                {
+                                    GetHistogram(tran, f);
+                                    tran.Commit();
+                                }
+                                OnPrepareProgress(allfiles.Length);
+                            }
+                        });
+                    }),
+                    Task.Run(() => 
+                    {
+                        list = ((ushort)allfiles.Length).GetIndexCombinations().ToList();
+                    })
                 });
+
+                var total = list.Count();
 
                 if (continueTest())
                 {
-                    var list = ((ushort)allfiles.Length).GetIndexCombinations();
-                    var total = list.Count();
-
-                    var rangePartitioner = Partitioner.Create(0, total);
-
-                    Parallel.ForEach(rangePartitioner, range =>
+                    try
                     {
-                        Debug.WriteLine("Starting range {0}-{1}", range.Item1, range.Item2);
-                        using (var tran = this.memoryEngine.GetTransaction())
+                        list.AsParallel().ForAll(c =>
                         {
-                            tran.SynchronizeTables("comp");
-                            for (int i = range.Item1; i < range.Item2; i++)
+                            using (var tran = this.memoryEngine.GetTransaction())
                             {
+                                //tran.SynchronizeTables("comp");
+                                tran.ValuesLazyLoadingIsOn = false;
                                 if (!continueTest())
                                 {
-                                    break;
+                                    return;
                                 }
-                                var c = list.ElementAt(i);
-                                GetComparisonResult(tran, allfiles.ElementAt(c.First()), allfiles.ElementAt(c.Last()), total, minSimilarity);
+                                var f = allfiles[c[0]];
+                                var l = allfiles[c[1]];
+                                var value = GetComparisonResult(tran, f, l);
+                                if (OnCompareProgress != null)
+                                {
+                                    if (value >= minSimilarity)
+                                    {
+                                        OnCompareProgress(total, f, l, value);
+                                    }
+                                    else
+                                    {
+                                        OnCompareProgress(total, null, null, 0);
+                                    }
+                                }
+                                tran.Commit();
                             }
-                            tran.Commit();
-                        }
-                    });
+                        });
+                    }
+                    finally
+                    {
+                        SaveToDb(engine);
+                    }
                 }
-
-                SaveToDb(engine);
-
-                this.memoryEngine.Dispose();
             }
         }
 
-        private void GetComparisonResult(Transaction tran, string first, string second, long total, double minValue)
+        private double GetComparisonResult(Transaction tran, string first, string second)
         {
             var value = 0.0;
-            var key = string.Join(".", new[] { first, second }.OrderBy(x => x));
+            var key = string.Join("|~|", new[] { first, second }.OrderBy(x => x)).GetInt64HashCode();
 
-            var compData = tran.Select<string, double>("comp", key);
+            var compData = tran.Select<long, double>("comp", key);
 
             if (!compData.Exists)
             {
-                value = this.GetHistogramComparison(tran, first, second, value);
+                var pc = GetHistogram(tran, first);
+                var cc = GetHistogram(tran, second);
+                value = pc.CalculateSimilarity(cc);
                 tran.Insert("comp", key, value);
             }
             else
@@ -123,41 +160,21 @@ namespace ImageFinder
                 value = compData.Value;
             }
 
-            if (OnCompareProgress != null)
-            {
-                if (value >= minValue)
-                {
-                    OnCompareProgress(total, first, second, value);
-                }
-                else
-                {
-                    OnCompareProgress(total, null, null, 0);
-                }
-            }
-        }
-
-        private double GetHistogramComparison(Transaction tran, string first, string second, double value)
-        {
-            var pc = GetHistogram(tran, first);
-            var cc = GetHistogram(tran, second);
-
-            value = pc.CalculateSimilarity(cc);
             return value;
         }
 
         private static ComparableImage GetHistogram(Transaction tran, string first)
         {
             ComparableImage pc = null;
-            var pcData = tran.Select<string, DbMJSON<double[][]>>("hist", first);
+            var pcData = tran.Select<string, HistogramData>("hist", first);
             if (!pcData.Exists)
             {
                 pc = new ComparableImage(new FileInfo(first));
-                tran.Insert("hist", first, new DbMJSON<double[][]>(pc.ToArray()));
-                Debug.Write("+");
+                tran.Insert("hist", first, new HistogramData(pc.Projections.HorizontalProjection,pc.Projections.VerticalProjection));
             }
             else
             {
-                pc = new ComparableImage(new FileInfo(first), pcData.Value.Get);
+                pc = new ComparableImage(new FileInfo(first), pcData.Value.X, pcData.Value.Y);
             }
             return pc;
         }
@@ -167,11 +184,11 @@ namespace ImageFinder
             using (var tran = engine.GetTransaction())
             using (var tMemory = this.memoryEngine.GetTransaction())
             {
-                foreach (var row in tran.SelectForward<string, DbMJSON<double[][]>>("hist"))
+                foreach (var row in tran.SelectForward<string, HistogramData>("hist"))
                 {
                     tMemory.Insert("hist", row.Key, row.Value);
                 }
-                foreach (var row in tran.SelectForward<string, double>("comp"))
+                foreach (var row in tran.SelectForward<long, double>("comp"))
                 {
                     tMemory.Insert("comp", row.Key, row.Value);
                 }
@@ -185,13 +202,13 @@ namespace ImageFinder
             using (var tMemory = this.memoryEngine.GetTransaction())
             {
                 tran.RemoveAllKeys("hist", true);
-                foreach (var row in tMemory.SelectForward<string, DbMJSON<double[][]>>("hist"))
+                foreach (var row in tMemory.SelectForward<string, HistogramData>("hist"))
                 {
                     tran.Insert("hist", row.Key, row.Value);
                 }
                 tran.Commit(); 
                 tran.RemoveAllKeys("comp", true);
-                foreach (var row in tMemory.SelectForward<string, double>("comp"))
+                foreach (var row in tMemory.SelectForward<long, double>("comp"))
                 {
                     tran.Insert("comp", row.Key, row.Value);
                 }

@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using ImageFinder;
+using OxyPlot;
 using SlavApp.Minion.ImageFinder.Actions;
 using SlavApp.Minion.Plugin;
 using System;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -20,6 +22,8 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
     public class MainViewModel : Screen
     {
         private readonly SimilarityRunAction sAction;
+        Timer timer = new Timer();
+        Timer eventTimer = new Timer();
         public MainViewModel(SimilarityRunAction sAction)
         {
             this.sAction = sAction;
@@ -28,7 +32,13 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.Completed += a_Completed;
             
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
-            this.SimLevel = 95;
+            this.SimLevel = 90;
+            this.PlotModel = new PlotModel();
+            this.PlotModel.Series.Add(new OxyPlot.Series.LineSeries());
+            timer.Interval = 1000;
+            timer.Elapsed += timer_Elapsed;
+            eventTimer.Interval = 250;
+            eventTimer.Elapsed += eventTimer_Elapsed;
         }
 
         private string directoryName;
@@ -53,8 +63,8 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
-        private int current;
-        public int Current
+        private long current;
+        public long Current
         {
             get { return current; }
             set
@@ -86,14 +96,27 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
-        private ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>> results;
-        public ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>> Results
+        private ObservableConcurrentDictionary<string, ResultViewModel> results;
+        public ObservableConcurrentDictionary<string, ResultViewModel> Results
         {
             get { return this.results; }
             set
             {
                 this.results = value;
                 NotifyOfPropertyChange(() => Results);
+                NotifyOfPropertyChange(() => List);
+            }
+        }
+
+        public List<ResultViewModel> List
+        {
+            get
+            {
+                if (Results == null)
+                {
+                    return Enumerable.Empty<ResultViewModel>().ToList();
+                }
+                return this.Results.OrderByDescending(x => x.Value.SimilarCount).Select(x => x.Value).ToList();
             }
         }
 
@@ -109,7 +132,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
 
         public IResult Run()
         {
-            this.Results = new ObservableConcurrentDictionary<string, BindableCollection<SimilarityModel>>();
+            this.Results = new ObservableConcurrentDictionary<string, ResultViewModel>();
             this.Results.IsNotifying = false;
             this.Current = 0;
             this.Maximum = int.MaxValue;
@@ -117,12 +140,29 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.CanRun = true;
             this.sAction.DirectoryName = this.DirectoryName;
             this.sAction.SimilarityLevel = (double)this.SimLevel / 100.0;
+
+            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Clear();
+            x = 0;
+            old = 0;
+            timer.Start();
+            eventTimer.Start();
             return this.sAction;
         }
 
-        public void ShowImage(string filename)
+        private long x = 0;
+        private long old = 0;
+        void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Process.Start(filename);
+            x++;
+            if (this.Current - old < 0)
+            {
+                old = 0;
+                this.PlotModel.InvalidatePlot(false);
+                return;
+            }
+            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Add(new DataPoint(x, this.Current - old));
+            this.PlotModel.InvalidatePlot(true);
+            old = this.Current;
         }
 
         void a_Completed(object sender, ResultCompletionEventArgs e)
@@ -133,48 +173,74 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 this.Maximum = int.MaxValue;
                 this.ProgressText = string.Empty;
             });
-            this.Results.IsNotifying = true;
+            NotifyOfPropertyChange(() => this.List);
+            this.sAction.CanRun = false;
+            timer.Stop();
+            eventTimer.Stop();
         }
 
         private void OnPrepareProgress(object sender, PrepareEventArgs ea)
         {
-            Execute.BeginOnUIThread(() =>
-            {
-                this.Maximum = ea.Total;
-                this.Current++;
-                this.ProgressText = string.Format("Preparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
-                if (this.Current == this.Maximum)
-                {
-                    this.Current = 0;
-                }
-            });
+            c++;
+            t = ea.Total;
         }
+
+        public PlotModel PlotModel { get; private set; }
+
+        private long c = 0;
+        private long t = 1;
+        private bool preparing = true;
 
         private void OnRunProgress(object sender, SimilarityRunEventArgs ea)
         {
-            Execute.BeginOnUIThread(() =>
+            if (preparing)
             {
-                this.Maximum = ea.Total;
-                this.Current++;
-                this.ProgressText = string.Format("Comparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / ea.Total) * 100.0, this.Current, ea.Total);
-            });
+                c = 0;
+                preparing = false;
+            }
+            c++;
+            t = ea.Total;
             if (ea.File1 != null)
             {
                 if (!this.Results.ContainsKey(ea.File1))
                 {
-                    this.Results.Add(ea.File1, new BindableCollection<SimilarityModel>());
+                    this.Results.Add(ea.File1, new ResultViewModel(new SimilarityModel() { Name = ea.File1 }));
                 }
-                this.Results[ea.File1].Add(new SimilarityModel() { Name = ea.File2, Value = ea.Value });
+                this.Results[ea.File1].Similar.Add(new SimilarityModel() { Name = ea.File2, Value = ea.Value });
             }
+        }
+
+        void eventTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Execute.BeginOnUIThread(() =>
+            {
+                this.Maximum = t;
+                this.Current = c;
+                if (preparing)
+                {
+                    this.ProgressText = string.Format("Preparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / t) * 100.0, this.Current, t);
+                }
+                else
+                {
+                    this.ProgressText = string.Format("Comparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / t) * 100.0, this.Current, t);
+                }
+            });
         }
 
         public override void CanClose(Action<bool> callback)
         {
-            this.sAction.CanRun = false;
-            this.sAction.Completed += (sender, ea) =>
+            if (!this.sAction.CanRun)
             {
                 callback(true);
-            };
+            }
+            else
+            {
+                this.sAction.CanRun = false;
+                this.sAction.Completed += (sender, ea) =>
+                {
+                    callback(true);
+                };
+            }
         }
     }
 }

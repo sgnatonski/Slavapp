@@ -72,9 +72,10 @@
                 var difference = source[i] - compare[i];
                 difference = Math.Round(difference, 2);
                 difference = Math.Abs(difference);
-                if (frequencies.ContainsKey(difference))
+                int value = 0;
+                if (frequencies.TryGetValue(difference, out value))
                 {
-                    frequencies[difference] = frequencies[difference] + 1;
+                    frequencies[difference] = value + 1;
                 }
                 else
                 {

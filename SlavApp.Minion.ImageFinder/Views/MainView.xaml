@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:SlavApp.Minion.ImageFinder"
+             xmlns:oxy="http://oxyplot.org/wpf"
              xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
@@ -32,6 +33,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <TextBox Grid.Column="0" x:Name="DirectoryName"></TextBox>
         <Button Grid.Column="1" x:Name="SelectDirectory" Content="..." Style="{DynamicResource SquareButtonStyle}"></Button>
@@ -39,34 +41,23 @@
         <Button Grid.Row="1" Grid.Column="1" x:Name="Run" Content="Run" Style="{DynamicResource SquareButtonStyle}"></Button>
         <Controls:MetroProgressBar Grid.Row="2" Grid.ColumnSpan="2" Value="{Binding Current}" Maximum="{Binding Maximum}" Height="30" />
         <TextBlock Grid.Row="3" Grid.ColumnSpan="2" x:Name="ProgressText"/>
-        <ScrollViewer  Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <ItemsControl x:Name="Results">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="Red" BorderThickness="2">
-                            <StackPanel Orientation="Horizontal">
-                                <Controls:Tile Width="100" Height="100" HorizontalAlignment="Left">
-                                    <Image Source="{Binding Path=Key, Converter={StaticResource imgConverter}, IsAsync=true}" Stretch="UniformToFill"></Image>
-                                </Controls:Tile>
-                                <ItemsControl ItemsSource="{Binding Value}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Controls:Tile Width="100" Height="100" HorizontalAlignment="Left">
-                                                <Image Source="{Binding Path=Name, Converter={StaticResource imgConverter}, IsAsync=true}" Stretch="UniformToFill"></Image>
-                                            </Controls:Tile>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+        <oxy:PlotView Grid.Row="4" Grid.ColumnSpan="2" Model="{Binding PlotModel}"/>
+        <ScrollViewer  Grid.Row="5" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                <ItemsControl x:Name="List">
+                    <ItemsControl.ItemTemplate>
+                        <ItemContainerTemplate>
+                            <Controls:Tile Width="100" Height="100" Title="{Binding Model.FileName}" Count="{Binding SimilarCount}" CountFontSize="26" TiltFactor="2">
+                                <Grid Width="100" Height="100">
+                                    <Image Source="{Binding Path=Model.Name, Converter={StaticResource imgConverter}, IsAsync=true}" Stretch="UniformToFill" Width="100" Height="100"></Image>
+                                    <!--<TextBlock Text="{Binding SimilarCount}"  HorizontalAlignment="Right"  VerticalAlignment="Top" FontSize="26" Foreground="Green" Background="White">
+                                </TextBlock>-->
+                                </Grid>
+                            </Controls:Tile>
+                        </ItemContainerTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </WrapPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

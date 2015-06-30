@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +21,12 @@ namespace SlavApp.Minion.ImageFinder
             {
                 this.name = value;
                 NotifyOfPropertyChange(() => Name);
+                NotifyOfPropertyChange(() => FileName);
             }
+        }
+        public string FileName
+        {
+            get { return Path.GetFileNameWithoutExtension(this.name); }
         }
         public double Value
         {
@@ -29,6 +36,11 @@ namespace SlavApp.Minion.ImageFinder
                 this.value = value;
                 NotifyOfPropertyChange(() => Value);
             }
+        }
+
+        public void ShowImage()
+        {
+            Process.Start(this.Name);
         }
     }
 }

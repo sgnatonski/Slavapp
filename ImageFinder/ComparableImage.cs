@@ -51,6 +51,23 @@
             projections = new RgbProjections(values);
         }
 
+        public ComparableImage(FileInfo file, double[] values1, double[] values2)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException("file");
+            }
+
+            if (!file.Exists)
+            {
+                throw new FileNotFoundException();
+            }
+
+            this.file = file;
+
+            projections = new RgbProjections(values1, values2);
+        }
+
         public FileInfo File
         {
             get
