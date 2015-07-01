@@ -74,31 +74,20 @@ namespace ImageFinder
 
             using (var engine = new DBreezeEngine(dbConf))
             {
-                List<ushort[]> list = null; 
-
-                Task.WaitAll(new[] 
+                allfiles.AsParallel().ForAll(f =>
                 {
-                    Task.Run(() => 
+                    if (continueTest())
                     {
-                        allfiles.AsParallel().ForAll(f =>
+                        using (var tran = this.memoryEngine.GetTransaction())
                         {
-                            if (continueTest())
-                            {
-                                using (var tran = this.memoryEngine.GetTransaction())
-                                {
-                                    GetHistogram(tran, f);
-                                    tran.Commit();
-                                }
-                                OnPrepareProgress(allfiles.Length);
-                            }
-                        });
-                    }),
-                    Task.Run(() => 
-                    {
-                        list = ((ushort)allfiles.Length).GetIndexCombinations().ToList();
-                    })
+                            GetHistogram(tran, f);
+                            tran.Commit();
+                        }
+                        OnPrepareProgress(allfiles.Length);
+                    }
                 });
 
+                var list = ((ushort)allfiles.Length).GetIndexCombinations();
                 var total = list.Count();
 
                 if (continueTest())

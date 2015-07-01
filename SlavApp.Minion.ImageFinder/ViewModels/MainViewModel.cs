@@ -19,18 +19,21 @@ using System.Windows.Threading;
 
 namespace SlavApp.Minion.ImageFinder.ViewModels
 {
-    public class MainViewModel : Screen
+    public class MainViewModel : Screen, IHandle<CancelProgressMessage>
     {
         private readonly SimilarityRunAction sAction;
+        private readonly IEventAggregator eventAggregator;
         Timer timer = new Timer();
         Timer eventTimer = new Timer();
-        public MainViewModel(SimilarityRunAction sAction)
+        public MainViewModel(IEventAggregator eventAggregator, SimilarityRunAction sAction)
         {
+            this.eventAggregator = eventAggregator;
+            this.eventAggregator.Subscribe(this);
             this.sAction = sAction;
             this.sAction.OnPrepareProgress += OnPrepareProgress;
             this.sAction.OnCompareProgress += OnRunProgress;
             this.sAction.Completed += a_Completed;
-            
+
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
             this.SimLevel = 90;
             this.PlotModel = new PlotModel();
@@ -49,39 +52,6 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             {
                 this.directoryName = value;
                 NotifyOfPropertyChange(() => DirectoryName);
-            }
-        }
-
-        private string progressText;
-        public string ProgressText
-        {
-            get { return progressText; }
-            set
-            {
-                this.progressText = value;
-                NotifyOfPropertyChange(() => ProgressText);
-            }
-        }
-
-        private long current;
-        public long Current
-        {
-            get { return current; }
-            set
-            {
-                this.current = value;
-                NotifyOfPropertyChange(() => Current);
-            }
-        }
-
-        private long maximum;
-        public long Maximum
-        {
-            get { return maximum; }
-            set
-            {
-                this.maximum = value;
-                NotifyOfPropertyChange(() => Maximum);
             }
         }
 
@@ -134,8 +104,6 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         {
             this.Results = new ObservableConcurrentDictionary<string, ResultViewModel>();
             this.Results.IsNotifying = false;
-            this.Current = 0;
-            this.Maximum = int.MaxValue;
 
             this.sAction.CanRun = true;
             this.sAction.DirectoryName = this.DirectoryName;
@@ -146,6 +114,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             old = 0;
             timer.Start();
             eventTimer.Start();
+            this.eventAggregator.PublishOnUIThread(new ProgressMessage() { IsInitial = true, Message = "[ 1 / 3 ] Starting analysis" });
             return this.sAction;
         }
 
@@ -154,29 +123,24 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             x++;
-            if (this.Current - old < 0)
+            if (c - old < 0)
             {
                 old = 0;
                 this.PlotModel.InvalidatePlot(false);
                 return;
             }
-            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Add(new DataPoint(x, this.Current - old));
+            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Add(new DataPoint(x, c - old));
             this.PlotModel.InvalidatePlot(true);
-            old = this.Current;
+            old = c;
         }
 
         void a_Completed(object sender, ResultCompletionEventArgs e)
         {
-            Execute.BeginOnUIThread(() =>
-            {
-                this.Current = 0;
-                this.Maximum = int.MaxValue;
-                this.ProgressText = string.Empty;
-            });
             NotifyOfPropertyChange(() => this.List);
             this.sAction.CanRun = false;
             timer.Stop();
             eventTimer.Stop();
+            this.eventAggregator.PublishOnUIThread(new ProgressMessage() { IsFinal = true });
         }
 
         private void OnPrepareProgress(object sender, PrepareEventArgs ea)
@@ -212,19 +176,29 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
 
         void eventTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Execute.BeginOnUIThread(() =>
+            if (c == 0)
             {
-                this.Maximum = t;
-                this.Current = c;
-                if (preparing)
+                return;
+            }
+
+            if (preparing)
+            {
+                this.eventAggregator.PublishOnUIThread(new ProgressMessage()
                 {
-                    this.ProgressText = string.Format("Preparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / t) * 100.0, this.Current, t);
-                }
-                else
+                    Current = c,
+                    Total = t,
+                    Message = string.Format("[ 2 / 3 ] Preparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t)
+                });
+            }
+            else
+            {
+                this.eventAggregator.PublishOnUIThread(new ProgressMessage()
                 {
-                    this.ProgressText = string.Format("Comparing: {0:0.00} % ({1} / {2})", (this.Current * 1.0 / t) * 100.0, this.Current, t);
-                }
-            });
+                    Current = c,
+                    Total = t,
+                    Message = string.Format("[ 3 / 3 ] Comparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t)
+                });
+            }
         }
 
         public override void CanClose(Action<bool> callback)
@@ -241,6 +215,11 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                     callback(true);
                 };
             }
+        }
+
+        public void Handle(CancelProgressMessage message)
+        {
+            this.sAction.CanRun = false;
         }
     }
 }
