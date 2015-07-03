@@ -53,15 +53,13 @@ namespace SlavApp.Minion.ViewModels
             this.controller.SetCancelable(true);
         }
 
-        public async Task UpdateProgress(string message, double current, double total)
+        public Task UpdateProgress(string message, double current, double total)
         {
             if (this.controller != null)
             {
                 if (this.controller.IsCanceled)
                 {
                     this.eventAggregator.PublishOnUIThread(new CancelProgressMessage());
-                    await this.controller.CloseAsync();
-                    this.controller = null;
                 }
                 else
                 {
@@ -73,6 +71,7 @@ namespace SlavApp.Minion.ViewModels
                     }
                 }
             }
+            return new Task(() => { });
         }
         public async Task CloseProgress()
         {
