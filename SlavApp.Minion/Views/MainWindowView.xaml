@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:cal="http://www.caliburnproject.org"
-    Width="850" MinHeight="200" SizeToContent="Height"
+    Width="850" MinHeight="320" SizeToContent="Height"
     BorderBrush="{DynamicResource AccentColorBrush}"
     BorderThickness="1"
     WindowStartupLocation="CenterScreen">

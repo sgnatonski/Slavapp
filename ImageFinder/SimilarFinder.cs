@@ -29,7 +29,7 @@ namespace ImageFinder
         };
 
         private DBreezeEngine memoryEngine;
-        public SimilarFinder()
+        static SimilarFinder()
         {
             DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
             DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = ListExtenstions.DeserializeProtobuf;
@@ -43,11 +43,9 @@ namespace ImageFinder
 
         public event PrepareProgressEventHandler OnPrepareProgress;
 
-        public event EventHandler OnInitialized;
-
-        public void Initialize()
+        public async Task<bool> Initialize()
         {
-            Task.Run(() =>
+            return await Task.Run(() =>
             {
                 this.memoryEngine = new DBreezeEngine(memConf);
 
@@ -56,10 +54,7 @@ namespace ImageFinder
                     LoadFromDb(engine);
                 };
 
-                if (OnInitialized != null)
-                {
-                    OnInitialized(this, new EventArgs());
-                }
+                return true;
             });
         }
 
@@ -96,29 +91,29 @@ namespace ImageFinder
                     {
                         list.AsParallel().ForAll(c =>
                         {
+                            if (!continueTest())
+                            {
+                                return;
+                            }
+                            var f = allfiles[c[0]];
+                            var l = allfiles[c[1]];
+                            var value = 0.0;
                             using (var tran = this.memoryEngine.GetTransaction())
                             {
-                                //tran.SynchronizeTables("comp");
                                 tran.ValuesLazyLoadingIsOn = false;
-                                if (!continueTest())
-                                {
-                                    return;
-                                }
-                                var f = allfiles[c[0]];
-                                var l = allfiles[c[1]];
-                                var value = GetComparisonResult(tran, f, l);
-                                if (OnCompareProgress != null)
-                                {
-                                    if (value >= minSimilarity)
-                                    {
-                                        OnCompareProgress(total, f, l, value);
-                                    }
-                                    else
-                                    {
-                                        OnCompareProgress(total, null, null, 0);
-                                    }
-                                }
+                                value = GetComparisonResult(tran, f, l);
                                 tran.Commit();
+                            }
+                            if (OnCompareProgress != null)
+                            {
+                                if (value >= minSimilarity)
+                                {
+                                    OnCompareProgress(total, f, l, value);
+                                }
+                                else
+                                {
+                                    OnCompareProgress(total, null, null, 0);
+                                }
                             }
                         });
                     }
@@ -126,6 +121,10 @@ namespace ImageFinder
                     {
                         SaveToDb(engine);
                     }
+                }
+                else
+                {
+                    SaveToDb(engine);
                 }
             }
         }

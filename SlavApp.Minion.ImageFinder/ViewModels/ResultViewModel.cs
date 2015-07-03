@@ -13,6 +13,12 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         {
             this.model = model;
             this.Similar = new BindableCollection<SimilarityModel>();
+            this.Similar.CollectionChanged += Similar_CollectionChanged;
+        }
+
+        void Similar_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifyOfPropertyChange(() => SimilarCount);
         }
 
         private SimilarityModel model;

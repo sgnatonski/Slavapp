@@ -23,8 +23,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
     {
         private readonly SimilarityRunAction sAction;
         private readonly IEventAggregator eventAggregator;
-        Timer timer = new Timer();
-        Timer eventTimer = new Timer();
+        private readonly Timer eventTimer = new Timer();
         public MainViewModel(IEventAggregator eventAggregator, SimilarityRunAction sAction)
         {
             this.eventAggregator = eventAggregator;
@@ -35,15 +34,19 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.Completed += a_Completed;
 
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
-            this.SimLevel = 90;
-            this.PlotModel = new PlotModel();
-            this.PlotModel.Series.Add(new OxyPlot.Series.LineSeries());
-            timer.Interval = 1000;
-            timer.Elapsed += timer_Elapsed;
-            eventTimer.Interval = 250;
+            this.SimLevel = 85;
+            eventTimer.Interval = 125;
             eventTimer.Elapsed += eventTimer_Elapsed;
         }
 
+        protected override void OnActivate()
+        {
+            progressVM = (IProgressViewModel)this.Parent;
+            base.OnActivate();
+        }
+
+        private IProgressViewModel progressVM;
+            
         private string directoryName;
         public string DirectoryName
         {
@@ -86,7 +89,8 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 {
                     return Enumerable.Empty<ResultViewModel>().ToList();
                 }
-                return this.Results.OrderByDescending(x => x.Value.SimilarCount).Select(x => x.Value).ToList();
+                var r = this.Results.Select(x => x.Value).OrderByDescending(x => x.Similar.Count).ToList();
+                return r;
             }
         }
 
@@ -105,55 +109,35 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.Results = new ObservableConcurrentDictionary<string, ResultViewModel>();
             this.Results.IsNotifying = false;
 
-            this.sAction.CanRun = true;
+            c = 0;
+            t = 1;
+            eventTimer.Start();
+
+            this.progressVM.ShowProgress();
+            this.progressVM.UpdateProgress("[ 1 / 3 ] Starting analysis", 0, 1);
             this.sAction.DirectoryName = this.DirectoryName;
             this.sAction.SimilarityLevel = (double)this.SimLevel / 100.0;
-
-            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Clear();
-            x = 0;
-            old = 0;
-            timer.Start();
-            eventTimer.Start();
-            this.eventAggregator.PublishOnUIThread(new ProgressMessage() { IsInitial = true, Message = "[ 1 / 3 ] Starting analysis" });
             return this.sAction;
         }
 
-        private long x = 0;
-        private long old = 0;
-        void timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            x++;
-            if (c - old < 0)
-            {
-                old = 0;
-                this.PlotModel.InvalidatePlot(false);
-                return;
-            }
-            this.PlotModel.Series.OfType<OxyPlot.Series.LineSeries>().First().Points.Add(new DataPoint(x, c - old));
-            this.PlotModel.InvalidatePlot(true);
-            old = c;
-        }
-
-        void a_Completed(object sender, ResultCompletionEventArgs e)
+        private async void a_Completed(object sender, ResultCompletionEventArgs e)
         {
             NotifyOfPropertyChange(() => this.List);
             this.sAction.CanRun = false;
-            timer.Stop();
             eventTimer.Stop();
-            this.eventAggregator.PublishOnUIThread(new ProgressMessage() { IsFinal = true });
+            await this.progressVM.CloseProgress();
         }
-
-        private void OnPrepareProgress(object sender, PrepareEventArgs ea)
-        {
-            c++;
-            t = ea.Total;
-        }
-
-        public PlotModel PlotModel { get; private set; }
 
         private long c = 0;
         private long t = 1;
         private bool preparing = true;
+
+        private void OnPrepareProgress(object sender, PrepareEventArgs ea)
+        {
+            preparing = true;
+            c++;
+            t = ea.Total;
+        }
 
         private void OnRunProgress(object sender, SimilarityRunEventArgs ea)
         {
@@ -174,30 +158,20 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
-        void eventTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void eventTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (c == 0)
             {
                 return;
             }
-
+            
             if (preparing)
             {
-                this.eventAggregator.PublishOnUIThread(new ProgressMessage()
-                {
-                    Current = c,
-                    Total = t,
-                    Message = string.Format("[ 2 / 3 ] Preparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t)
-                });
+                this.progressVM.UpdateProgress(string.Format("[ 2 / 3 ] Preparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t), c, t);
             }
             else
             {
-                this.eventAggregator.PublishOnUIThread(new ProgressMessage()
-                {
-                    Current = c,
-                    Total = t,
-                    Message = string.Format("[ 3 / 3 ] Comparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t)
-                });
+                this.progressVM.UpdateProgress(string.Format("[ 3 / 3 ] Comparing: {0:0.00} % ({1} / {2})", (c * 1.0 / t) * 100.0, c, t), c, t);
             }
         }
 

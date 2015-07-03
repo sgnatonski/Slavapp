@@ -51,9 +51,9 @@
   <ItemGroup>
     <Compile Include="IPlugin.cs" />
     <Compile Include="IPluginManager.cs" />
+    <Compile Include="IProgressViewModel.cs" />
     <Compile Include="ObservableConcurrentDictionary.cs" />
     <Compile Include="CancelProgressMessage.cs" />
-    <Compile Include="ProgressMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Curious-Minion-Icon-2.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Caliburn.Micro">
       <HintPath>..\packages\Caliburn.Micro.Core.3.0.0-alpha\lib\net45\Caliburn.Micro.dll</HintPath>
@@ -52,6 +55,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.1.3-ALPHA098\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -121,6 +125,12 @@
       <Project>{a54db1cc-bfca-4f85-8bb1-ecd980ce699c}</Project>
       <Name>SlavApp.Minion.Plugin</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Curious-Minion-Icon-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Curious-Minion-Icon-2.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

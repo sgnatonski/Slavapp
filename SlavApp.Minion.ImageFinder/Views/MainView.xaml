@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:SlavApp.Minion.ImageFinder"
-             xmlns:oxy="http://oxyplot.org/wpf"
              xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
@@ -34,14 +33,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <TextBox Grid.Column="0" x:Name="DirectoryName" Margin="2 2 3 2"></TextBox>
         <Button Grid.Column="0" x:Name="SelectDirectory" Content="..." Margin="0 2 2 2" HorizontalAlignment="Right"></Button>
         <Controls:NumericUpDown Grid.Column="2" Value="{Binding SimLevel}" Margin="2"></Controls:NumericUpDown>
         <Button Grid.Row="1" Grid.Column="2" x:Name="Run" Content="Run" Margin="2"></Button>
-        <oxy:PlotView Grid.Row="4" Grid.ColumnSpan="3" Model="{Binding PlotModel}" Margin="2"/>
-        <ScrollViewer  Grid.Row="5" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer  Grid.Row="4" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Auto">
             <ItemsControl x:Name="List" Margin="2">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
