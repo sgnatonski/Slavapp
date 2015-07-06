@@ -33,6 +33,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBox Grid.Column="0" x:Name="DirectoryName" Margin="2 2 3 2"></TextBox>
         <Button Grid.Column="0" x:Name="SelectDirectory" Content="..." Margin="0 2 2 2" HorizontalAlignment="Right"></Button>
@@ -47,7 +48,9 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Controls:Tile Width="150" Height="120">
+                        <Controls:Tile Width="150" Height="120" 
+                                       cal:Message.Attach="[Event Click] = [Action ShowSimilarImages($dataContext)]"
+                                       cal:Action.TargetWithoutContext="{Binding DataContext, ElementName=container}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="100"/>
@@ -62,6 +65,35 @@
                                     <TextBlock Text="{Binding SimilarCount}" FontSize="26" Foreground="Green" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
                                 </Grid>
                                 <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Model.FileName}" Background="White" Foreground="Blue" Padding="2 0"/>
+                            </Grid>
+                        </Controls:Tile>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <ScrollViewer  Grid.Row="5" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="Similar" Margin="2">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Controls:Tile Width="150" Height="120" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="50"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="100"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+                                <Image Source="{Binding Path=Name, Converter={StaticResource imgConverter}, IsAsync=true}" Stretch="UniformToFill"></Image>
+                                <Grid Grid.Column="1" Background="White">
+                                </Grid>
+                                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding FileName}" Background="White" Foreground="Blue" Padding="2 0"/>
                             </Grid>
                         </Controls:Tile>
                     </DataTemplate>

@@ -11,8 +11,8 @@ namespace SlavApp.Minion.ImageFinder.Actions
 {
     public class SimilarityRunAction : IResult
     {
-        private readonly SimilarFinder simFinder;
-        public SimilarityRunAction(SimilarFinder simFinder)
+        private readonly SimilarPHashFinder simFinder;
+        public SimilarityRunAction(SimilarPHashFinder simFinder)
         {
             this.simFinder = simFinder;
             this.simFinder.OnPrepareProgress += OnPrepProgress;

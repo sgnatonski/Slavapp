@@ -58,7 +58,8 @@
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="RgbProjections.cs" />
-    <Compile Include="SimilarFinder.cs" />
+    <Compile Include="SimilarPHashFinder.cs" />
+    <Compile Include="SimilarHistogramFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimilarityImages.cs" />
     <Compile Include="HistogramData.cs" />

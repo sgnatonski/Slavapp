@@ -1,6 +1,5 @@
 ﻿using Caliburn.Micro;
 using ImageFinder;
-using OxyPlot;
 using SlavApp.Minion.ImageFinder.Actions;
 using SlavApp.Minion.Plugin;
 using System;
@@ -94,6 +93,17 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
         }
 
+        private List<SimilarityModel> similar;
+        public List<SimilarityModel> Similar
+        {
+            get { return similar; }
+            set
+            {
+                this.similar = value;
+                NotifyOfPropertyChange(() => Similar);
+            }
+        }
+
         public void SelectDirectory()
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -111,12 +121,13 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
 
             c = 0;
             t = 1;
-            eventTimer.Start();
-
             this.progressVM.ShowProgress();
             this.progressVM.UpdateProgress("[ 1 / 3 ] Starting analysis", 0, 1);
             this.sAction.DirectoryName = this.DirectoryName;
-            this.sAction.SimilarityLevel = (double)this.SimLevel / 100.0;
+            this.sAction.SimilarityLevel = (double)this.SimLevel;
+
+            eventTimer.Start();
+
             return this.sAction;
         }
 
@@ -194,6 +205,11 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         public void Handle(CancelProgressMessage message)
         {
             this.sAction.CanRun = false;
+        }
+
+        public void ShowSimilarImages(ResultViewModel model)
+        {
+            this.Similar = model.Similar.ToList();
         }
     }
 }

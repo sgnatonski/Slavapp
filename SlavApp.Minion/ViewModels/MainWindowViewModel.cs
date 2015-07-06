@@ -61,7 +61,7 @@ namespace SlavApp.Minion.ViewModels
                 {
                     this.eventAggregator.PublishOnUIThread(new CancelProgressMessage());
                 }
-                else
+                else if (controller.IsOpen)
                 {
                     this.controller.SetMessage(message);
                     this.controller.Maximum = total;

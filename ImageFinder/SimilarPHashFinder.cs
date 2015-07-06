@@ -13,11 +13,25 @@ using Newtonsoft.Json;
 using System.Reflection;
 using System.Numerics;
 using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 namespace ImageFinder
 {
-    public class SimilarFinder
+    public class SimilarPHashFinder
     {
+        [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ph_dct_imagehash(string file, ref ulong hash);
+        [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
+
+        public delegate void CompareProgressEventHandler(long total, string file1, string file2, double value);
+
+        public event CompareProgressEventHandler OnCompareProgress;
+
+        public delegate void PrepareProgressEventHandler(long total);
+
+        public event PrepareProgressEventHandler OnPrepareProgress;
+
         private readonly DBreezeConfiguration dbConf = new DBreezeConfiguration()
         {
             DBreezeDataFolderName = Path.Combine(Utils.GetAssemblyPath(), "DBR"),
@@ -29,19 +43,11 @@ namespace ImageFinder
         };
 
         private DBreezeEngine memoryEngine;
-        static SimilarFinder()
+        static SimilarPHashFinder()
         {
             DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
             DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = ListExtenstions.DeserializeProtobuf;
         }
-
-        public delegate void CompareProgressEventHandler(long total, string file1, string file2, double value);
-
-        public event CompareProgressEventHandler OnCompareProgress;
-
-        public delegate void PrepareProgressEventHandler(long total);
-
-        public event PrepareProgressEventHandler OnPrepareProgress;
 
         public async Task<bool> Initialize()
         {
@@ -75,7 +81,7 @@ namespace ImageFinder
                     {
                         using (var tran = this.memoryEngine.GetTransaction())
                         {
-                            GetHistogram(tran, f);
+                            GetHash(tran, f);
                             tran.Commit();
                         }
                         OnPrepareProgress(allfiles.Length);
@@ -106,7 +112,7 @@ namespace ImageFinder
                             }
                             if (OnCompareProgress != null)
                             {
-                                if (value >= minSimilarity)
+                                if (100 - value >= minSimilarity)
                                 {
                                     OnCompareProgress(total, f, l, value);
                                 }
@@ -131,17 +137,17 @@ namespace ImageFinder
 
         private double GetComparisonResult(Transaction tran, string first, string second)
         {
-            var value = 0.0;
+            var value = 0;
             var key = string.Join("|~|", new[] { first, second }.OrderBy(x => x)).GetInt64HashCode();
 
-            var compData = tran.Select<long, double>("comp", key);
+            var compData = tran.Select<long, int>("dist", key);
 
             if (!compData.Exists)
             {
-                var pc = GetHistogram(tran, first);
-                var cc = GetHistogram(tran, second);
-                value = pc.CalculateSimilarity(cc);
-                tran.Insert("comp", key, value);
+                var pc = GetHash(tran, first);
+                var cc = GetHash(tran, second);
+                value = ph_hamming_distance(pc, cc);
+                tran.Insert("dist", key, value);
             }
             else
             {
@@ -151,20 +157,17 @@ namespace ImageFinder
             return value;
         }
 
-        private static ComparableImage GetHistogram(Transaction tran, string first)
+        private static ulong GetHash(Transaction tran, string first)
         {
-            ComparableImage pc = null;
-            var pcData = tran.Select<string, HistogramData>("hist", first);
+            var pcData = tran.Select<string, ulong>("hash", first);
             if (!pcData.Exists)
             {
-                pc = new ComparableImage(new FileInfo(first));
-                tran.Insert("hist", first, new HistogramData(pc.Projections.HorizontalProjection,pc.Projections.VerticalProjection));
+                ulong hash = 0;
+                ph_dct_imagehash(first, ref hash);
+                tran.Insert("hash", first, hash);
+                return hash;
             }
-            else
-            {
-                pc = new ComparableImage(new FileInfo(first), pcData.Value.X, pcData.Value.Y);
-            }
-            return pc;
+            return pcData.Value;
         }
 
         private void LoadFromDb(DBreezeEngine engine)
@@ -172,13 +175,13 @@ namespace ImageFinder
             using (var tran = engine.GetTransaction())
             using (var tMemory = this.memoryEngine.GetTransaction())
             {
-                foreach (var row in tran.SelectForward<string, HistogramData>("hist"))
+                foreach (var row in tran.SelectForward<string, ulong>("hash"))
                 {
-                    tMemory.Insert("hist", row.Key, row.Value);
+                    tMemory.Insert("hash", row.Key, row.Value);
                 }
-                foreach (var row in tran.SelectForward<long, double>("comp"))
+                foreach (var row in tran.SelectForward<long, int>("dist"))
                 {
-                    tMemory.Insert("comp", row.Key, row.Value);
+                    tMemory.Insert("dist", row.Key, row.Value);
                 }
                 tMemory.Commit();
             }
@@ -189,16 +192,16 @@ namespace ImageFinder
             using (var tran = engine.GetTransaction())
             using (var tMemory = this.memoryEngine.GetTransaction())
             {
-                tran.RemoveAllKeys("hist", true);
-                foreach (var row in tMemory.SelectForward<string, HistogramData>("hist"))
+                tran.RemoveAllKeys("hash", true);
+                foreach (var row in tMemory.SelectForward<string, ulong>("hash"))
                 {
-                    tran.Insert("hist", row.Key, row.Value);
+                    tran.Insert("hash", row.Key, row.Value);
                 }
-                tran.Commit(); 
-                tran.RemoveAllKeys("comp", true);
-                foreach (var row in tMemory.SelectForward<long, double>("comp"))
+                tran.Commit();
+                tran.RemoveAllKeys("dist", true);
+                foreach (var row in tMemory.SelectForward<long, int>("dist"))
                 {
-                    tran.Insert("comp", row.Key, row.Value);
+                    tran.Insert("dist", row.Key, row.Value);
                 }
                 tran.Commit();
             }

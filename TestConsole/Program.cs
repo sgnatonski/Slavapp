@@ -14,7 +14,7 @@ namespace TestConsole
         static void Main(string[] args)
         {
             var current = 0.0;
-            var sf = new SimilarFinder();
+            var sf = new SimilarHistogramFinder();
             sf.OnCompareProgress += (total, file1, file2, v) =>
             {
                 //lock(lockObj)
