@@ -11,12 +11,14 @@ namespace SlavApp.Minion.ImageFinder.Actions
 {
     public class SimilarityRunAction : IResult
     {
-        private readonly SimilarPHashFinder simFinder;
-        public SimilarityRunAction(SimilarPHashFinder simFinder)
+        private readonly PHashCalculator simFinder;
+        private readonly PHashComparer simComparer;
+        public SimilarityRunAction(PHashCalculator simFinder, PHashComparer simComparer)
         {
             this.simFinder = simFinder;
-            this.simFinder.OnPrepareProgress += OnPrepProgress;
-            this.simFinder.OnCompareProgress += OnRunProgress;
+            this.simFinder.OnProgress += OnPrepProgress;
+            this.simComparer = simComparer;
+            this.simComparer.OnCompareProgress += OnRunProgress;
         }
 
         public string DirectoryName { get; set; }
@@ -27,17 +29,15 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public event EventHandler<SimilarityRunEventArgs> OnCompareProgress = delegate { };
         public event EventHandler<PrepareEventArgs> OnPrepareProgress = delegate { };
 
-        private bool isInitialized = false;
-
         public async void Execute(CoroutineExecutionContext context)
         {
             this.CanRun = true;
-            if (!this.isInitialized)
-            {
-                this.isInitialized = await this.simFinder.Initialize();
-            }
-            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", SimilarityLevel, () => this.CanRun));
-            
+            await this.simFinder.Initialize();
+            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", () => this.CanRun));
+
+            await this.simComparer.Initialize();
+            await Task.Run(() => this.simComparer.Run(this.DirectoryName, "*.jpg", SimilarityLevel, () => this.CanRun));
+
             Completed(this, new ResultCompletionEventArgs());
         }
 
@@ -46,7 +46,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
             OnPrepareProgress(this, new PrepareEventArgs(total));
         }
 
-        private void OnRunProgress(long total, string file1, string file2, double value)
+        private void OnRunProgress(long total, string file1, string[] file2, double value)
         {
             OnCompareProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
         }
@@ -54,7 +54,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
 
     public class SimilarityRunEventArgs :EventArgs
     {
-        public SimilarityRunEventArgs(long total, string file1, string file2, double value)
+        public SimilarityRunEventArgs(long total, string file1, string[] file2, double value)
         {
             Total = total;
             File1 = file1;
@@ -63,7 +63,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
         }
         public long Total { get; private set; }
         public string File1 { get; private set; }
-        public string File2 { get; private set; }
+        public string[] File2 { get; private set; }
         public double Value { get; private set; }
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
+//using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ namespace ImageFinder
 {
     public static class Utils
     {
-        public static BigInteger Factorial(BigInteger num)
+        /*public static BigInteger Factorial(BigInteger num)
         {
             BigInteger result = num;
 
@@ -20,7 +20,7 @@ namespace ImageFinder
                 result = result * i;
             }
             return result;
-        }
+        }*/
 
         public static string GetAssemblyPath()
         {
@@ -30,12 +30,12 @@ namespace ImageFinder
             return path;
         }
 
-        public static long GetPermutationsCount(long itemsCount, int permutations)
+        /*public static long GetPermutationsCount(long itemsCount, int permutations)
         {
             var n = Utils.Factorial(itemsCount);
             var r = Utils.Factorial(itemsCount - permutations);
             var total = (long)(n / r);
             return total;
-        }
+        }*/
     }
 }

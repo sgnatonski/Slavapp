@@ -11,7 +11,6 @@ using DBreeze.Transactions;
 using DBreeze.DataTypes;
 using Newtonsoft.Json;
 using System.Reflection;
-using System.Numerics;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 

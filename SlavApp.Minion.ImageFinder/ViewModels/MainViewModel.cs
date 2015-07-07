@@ -163,9 +163,10 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             {
                 if (!this.Results.ContainsKey(ea.File1))
                 {
-                    this.Results.Add(ea.File1, new ResultViewModel(new SimilarityModel() { Name = ea.File1 }));
+                    var r = new ResultViewModel(new SimilarityModel() { Name = ea.File1 });
+                    r.Similar.AddRange(ea.File2.Select(x => new SimilarityModel() { Name = x }));
+                    this.Results.Add(ea.File1, r);
                 }
-                this.Results[ea.File1].Similar.Add(new SimilarityModel() { Name = ea.File2, Value = ea.Value });
             }
         }
 
