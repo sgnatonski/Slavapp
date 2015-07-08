@@ -21,5 +21,11 @@ namespace SlavApp.Minion.ImageFinder
         { 
             get { return typeof(MainViewModel); }
         }
+
+
+        public string IconName
+        {
+            get { return "appbar.magnify.browse"; }
+        }
     }
 }

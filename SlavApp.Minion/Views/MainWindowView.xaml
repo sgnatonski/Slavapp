@@ -4,23 +4,48 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:cal="http://www.caliburnproject.org"
+    xmlns:local="clr-namespace:SlavApp.Minion"
     Width="850" MinHeight="320" SizeToContent="Height"
     BorderBrush="{DynamicResource AccentColorBrush}"
     BorderThickness="1"
     WindowStartupLocation="CenterScreen">
-
+    <Window.Resources>
+        <ResourceDictionary>
+            <local:IconResourceConverter x:Key="IconResourceConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
-            <Button Content="Home" cal:Message.Attach="[Event Click] = [Action ShowMain()]"/>
+            <Button cal:Message.Attach="[Event Click] = [Action ShowMain()]">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="24" Height="24">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_home}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock Text="Home" VerticalAlignment="Center" Padding="6 0 0 0" />
+                </StackPanel>
+            </Button>
         </Controls:WindowCommands>
     </Controls:MetroWindow.RightWindowCommands>
     <Grid x:Name="grid">
         <ItemsControl x:Name="Plugins">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Controls:Tile Title="{Binding Name}" Width="100" Height="100" 
+                    <Controls:Tile Title="{Binding Name}" Width="100" Height="100" TitleFontSize="14"
                                    cal:Message.Attach="[Event Click] = [Action ShowPluginView($dataContext)]"
-                                   cal:Action.TargetWithoutContext="{Binding DataContext, ElementName=grid}"></Controls:Tile>
+                                   cal:Action.TargetWithoutContext="{Binding DataContext, ElementName=grid}">
+                        <Rectangle Width="100" Height="100">
+                            <Rectangle.Fill>
+                                <VisualBrush Visual="{Binding IconName, Converter={StaticResource IconResourceConverter}}" />
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Controls:Tile>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

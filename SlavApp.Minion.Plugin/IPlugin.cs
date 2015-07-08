@@ -11,6 +11,7 @@ namespace SlavApp.Minion.Plugin
     public interface IPlugin
     {
         string Name { get; }
+        string IconName { get; }
         Type EntryViewModelType { get; }
     }
 }

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.ImageFinder"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.Plugin", "SlavApp.Minion.Plugin\SlavApp.Minion.Plugin.csproj", "{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.ImageCompressor", "SlavApp.Minion.ImageCompressor\SlavApp.Minion.ImageCompressor.csproj", "{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
