@@ -1,18 +1,11 @@
-﻿using EyeOpen.Imaging;
+﻿using DBreeze;
+using DBreeze.Transactions;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DBreeze;
-using DBreeze.Transactions;
-using DBreeze.DataTypes;
-using Newtonsoft.Json;
-using System.Reflection;
-using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace ImageFinder
 {
@@ -30,6 +23,7 @@ namespace ImageFinder
             DBreezeDataFolderName = Path.Combine(Utils.GetAssemblyPath(), "DBR"),
             Storage = DBreezeConfiguration.eStorage.DISK
         };
+
         private readonly DBreezeConfiguration memConf = new DBreezeConfiguration()
         {
             Storage = DBreezeConfiguration.eStorage.MEMORY
@@ -90,7 +84,9 @@ namespace ImageFinder
             if (!pcData.Exists)
             {
                 ulong hash = 0;
+                var sw = Stopwatch.StartNew();
                 ph_dct_imagehash(filename, ref hash);
+                Debug.WriteLine(string.Format("ph_dct_imagehash: {0} ms", sw.ElapsedMilliseconds));
                 tran.Insert("hash", filename, hash);
                 return hash;
             }

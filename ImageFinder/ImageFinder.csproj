@@ -36,9 +36,6 @@
       <HintPath>..\packages\DBreeze.1.71.1\lib\net45\DBreeze.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Jint">
-      <HintPath>..\packages\Jint.2.5.0\lib\portable-net40+sl50+win+wpa81+wp80\Jint.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -64,6 +61,7 @@
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="PHashComparer.cs" />
+    <Compile Include="PriorityQueue.cs" />
     <Compile Include="RgbProjections.cs" />
     <Compile Include="PHashCalculator.cs" />
     <Compile Include="SimilarHistogramFinder.cs" />
@@ -71,17 +69,12 @@
     <Compile Include="SimilarityImages.cs" />
     <Compile Include="HistogramData.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="VPTree.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\main.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="js\vptree.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

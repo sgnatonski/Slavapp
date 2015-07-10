@@ -73,7 +73,7 @@
             var projections =
                 new[]
                     {
-                        horizontalProjection, 
+                        horizontalProjection,
                         verticalProjection
                     };
 

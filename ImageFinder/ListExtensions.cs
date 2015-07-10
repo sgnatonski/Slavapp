@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageFinder
 {
@@ -18,6 +17,7 @@ namespace ImageFinder
             }
             return ret;
         }
+
         public static object DeserializeProtobuf(byte[] data, Type T)
         {
             object ret = null;
@@ -28,6 +28,7 @@ namespace ImageFinder
             }
             return ret;
         }
+
         public static byte[] SerializeProtobuf(this object data)
         {
             byte[] bt = null;
@@ -101,6 +102,17 @@ namespace ImageFinder
                          group item by i++ % parts into part
                          select part.AsEnumerable();
             return splits;
+        }
+
+        public static List<T> Splice<T>(this List<T> list, int offset, int count, params T[] items)
+        {
+            if (items.Any())
+            {
+                list.InsertRange(offset, items);
+            }
+            var itemsRemoved = list.Skip(offset).Take(count).ToList();
+            list.RemoveRange(offset, count);
+            return itemsRemoved;
         }
     }
 }

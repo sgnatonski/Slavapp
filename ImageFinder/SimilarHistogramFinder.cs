@@ -1,39 +1,29 @@
-﻿using EyeOpen.Imaging;
+﻿using DBreeze;
+using DBreeze.Transactions;
+using EyeOpen.Imaging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DBreeze;
-using DBreeze.Transactions;
-using DBreeze.DataTypes;
-using Newtonsoft.Json;
-using System.Reflection;
-using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace ImageFinder
 {
     public class SimilarHistogramFinder
     {
-        [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int ph_dct_imagehash(string file, ref ulong hash);
-        [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
-
         private readonly DBreezeConfiguration dbConf = new DBreezeConfiguration()
         {
             DBreezeDataFolderName = Path.Combine(Utils.GetAssemblyPath(), "DBR"),
             Storage = DBreezeConfiguration.eStorage.DISK
         };
+
         private readonly DBreezeConfiguration memConf = new DBreezeConfiguration()
         {
             Storage = DBreezeConfiguration.eStorage.MEMORY
         };
 
         private DBreezeEngine memoryEngine;
+
         static SimilarHistogramFinder()
         {
             DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
@@ -163,7 +153,7 @@ namespace ImageFinder
             if (!pcData.Exists)
             {
                 pc = new ComparableImage(new FileInfo(first));
-                tran.Insert("hist", first, new HistogramData(pc.Projections.HorizontalProjection,pc.Projections.VerticalProjection));
+                tran.Insert("hist", first, new HistogramData(pc.Projections.HorizontalProjection, pc.Projections.VerticalProjection));
             }
             else
             {
@@ -199,7 +189,7 @@ namespace ImageFinder
                 {
                     tran.Insert("hist", row.Key, row.Value);
                 }
-                tran.Commit(); 
+                tran.Commit();
                 tran.RemoveAllKeys("comp", true);
                 foreach (var row in tMemory.SelectForward<long, double>("comp"))
                 {

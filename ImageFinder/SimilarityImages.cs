@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Represents a comparable images class.
@@ -76,7 +75,7 @@
             return x.similarity.CompareTo(y.similarity);
         }
 
-        #endregion
+        #endregion IComparer<SimilarityImages> Members
 
         #region IComparable Members
 
@@ -86,7 +85,7 @@
             return this.Compare(this, other);
         }
 
-        #endregion
+        #endregion IComparable Members
 
         public override bool Equals(object obj)
         {

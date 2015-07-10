@@ -1,19 +1,10 @@
-﻿using EyeOpen.Imaging;
+﻿using DBreeze;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DBreeze;
-using DBreeze.Transactions;
-using DBreeze.DataTypes;
-using Newtonsoft.Json;
-using System.Reflection;
-using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
-using Jint;
+using System.Threading.Tasks;
 
 namespace ImageFinder
 {
@@ -31,14 +22,15 @@ namespace ImageFinder
             DBreezeDataFolderName = Path.Combine(Utils.GetAssemblyPath(), "DBR"),
             Storage = DBreezeConfiguration.eStorage.DISK
         };
+
         private readonly DBreezeConfiguration memConf = new DBreezeConfiguration()
         {
             Storage = DBreezeConfiguration.eStorage.MEMORY
         };
 
-        private readonly Engine _engine = new Engine(); 
         private DBreezeEngine memoryEngine;
         private bool isInitialized = false;
+
         static PHashComparer()
         {
             DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
@@ -60,19 +52,6 @@ namespace ImageFinder
                 {
                     LoadFromDb(engine);
                 };
-
-                var sb = new StringBuilder();
-                var vptree = File.ReadAllText(Path.Combine(Utils.GetAssemblyPath(), "js/vptree.js"));
-                var main = File.ReadAllText(Path.Combine(Utils.GetAssemblyPath(), "js/main.js"));
-                sb.Append(vptree);
-                sb.Append(Environment.NewLine);
-                sb.Append(main);
-
-                _engine.SetValue("hamming_distance", new Func<ulong, ulong, int>((x, y) =>
-                {
-                    return ph_hamming_distance(x, y);
-                }));
-                _engine.Execute(sb.ToString());
             });
 
             this.isInitialized = true;
@@ -81,12 +60,6 @@ namespace ImageFinder
         public void Run(string directory, string filter, double minSimilarity)
         {
             this.Run(directory, filter, minSimilarity, () => true);
-        }
-
-        public class VPTreeResult
-        {
-            public int i { get; set; }
-            public int d { get; set; }
         }
 
         public void Run(string directory, string filter, double minSimilarity, Func<bool> continueTest)
@@ -102,7 +75,7 @@ namespace ImageFinder
             }
             var hashesArray = hashes.Keys.ToArray();
 
-            _engine.Invoke("build", hashesArray);
+            var tree = VPTree.Build(hashesArray, ph_hamming_distance);
 
             allfiles.ToList().ForEach(f =>
             {
@@ -113,12 +86,10 @@ namespace ImageFinder
                     {
                         hash = tMemory.Select<string, ulong>("hash", f).Value;
                     }
-                    var result = _engine.Invoke("search", hash, 10, maxSimilarityDistance);
-                    var a = result.AsArray();
-                    var l = (int)a.Get("length").AsNumber();
-                    var values = Enumerable.Range(0, l).Select(x => a.GetProperty(x.ToString()).Value.Value.AsObject().Properties.Select(p => new { Key = p.Key, Value = p.Value.Value.Value.AsNumber() }).ToList()).ToList();
-                    var foundHashes = values.Select(x => x.Where(p => p.Key == "i").Select(p => hashesArray[(int)p.Value])).SelectMany(x => x).Distinct();
-                    var files = foundHashes.Select(x => hashes[x].Where(c => !c.Contains(f)).Select(c => c)).SelectMany(x => x).ToArray();
+
+                    var result = tree.searchVPTree(hash, 10, maxSimilarityDistance);
+                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x].Where(c => !c.Contains(f)).Select(c => c)).SelectMany(x => x).ToArray();
+
                     if (files.Any())
                     {
                         OnCompareProgress(allfiles.Count(), f, files, 0);
