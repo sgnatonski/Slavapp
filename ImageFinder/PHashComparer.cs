@@ -67,30 +67,25 @@ namespace ImageFinder
             var maxSimilarityDistance = 20 - (int)(20 * (minSimilarity / 100.0));
             var allfiles = System.IO.Directory.GetFiles(directory, filter, System.IO.SearchOption.AllDirectories);
 
+            Dictionary<string, ulong> dict = null;
             Dictionary<ulong, List<string>> hashes = null;
             using (var tMemory = this.memoryEngine.GetTransaction())
             {
-                var dict = tMemory.SelectForward<string, ulong>("hash").ToDictionary(x => x.Key, y => y.Value);
+                dict = tMemory.SelectForward<string, ulong>("hash").ToDictionary(x => x.Key, y => y.Value);
                 hashes = dict.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
             }
             var hashesArray = hashes.Keys.ToArray();
 
             var tree = VPTree.Build(hashesArray, ph_hamming_distance);
 
-            allfiles.ToList().ForEach(f =>
+            allfiles.AsParallel().ForAll(f =>
             {
                 if (continueTest())
                 {
-                    ulong hash = 0;
-                    using (var tMemory = this.memoryEngine.GetTransaction())
-                    {
-                        hash = tMemory.Select<string, ulong>("hash", f).Value;
-                    }
+                    var result = tree.searchVPTree(dict[f], 10, maxSimilarityDistance);
+                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).ToArray();
 
-                    var result = tree.searchVPTree(hash, 10, maxSimilarityDistance);
-                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x].Where(c => !c.Contains(f)).Select(c => c)).SelectMany(x => x).ToArray();
-
-                    if (files.Any())
+                    if (files.Any(x => x != f))
                     {
                         OnCompareProgress(allfiles.Count(), f, files, 0);
                     }
@@ -111,27 +106,8 @@ namespace ImageFinder
                 {
                     tMemory.Insert("hash", row.Key, row.Value);
                 }
-                //tMemory.Commit();
-                /*foreach (var row in tran.SelectForward<long, int>("dist"))
-                {
-                    tMemory.Insert("dist", row.Key, row.Value);
-                }*/
                 tMemory.Commit();
             }
-        }
-
-        private void SaveToDb(DBreezeEngine engine)
-        {
-            /*using (var tran = engine.GetTransaction())
-            using (var tMemory = this.memoryEngine.GetTransaction())
-            {
-                tran.RemoveAllKeys("dist", true);
-                foreach (var row in tMemory.SelectForward<long, int>("dist"))
-                {
-                    tran.Insert("dist", row.Key, row.Value);
-                }
-                tran.Commit();
-            }*/
         }
 
         public void Dispose()
