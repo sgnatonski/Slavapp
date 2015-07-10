@@ -5,7 +5,7 @@
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:local="clr-namespace:SlavApp.Minion"
-    Width="850" MinHeight="320" SizeToContent="Height"
+    Width="850" MinHeight="600"
     BorderBrush="{DynamicResource AccentColorBrush}"
     BorderThickness="1"
     WindowStartupLocation="CenterScreen">

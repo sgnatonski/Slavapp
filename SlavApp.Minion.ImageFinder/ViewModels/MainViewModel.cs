@@ -212,5 +212,10 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         {
             this.Similar = model.Similar.ToList();
         }
+
+        public void HideSimilarImages()
+        {
+            this.Similar = new List<SimilarityModel>();
+        }
     }
 }

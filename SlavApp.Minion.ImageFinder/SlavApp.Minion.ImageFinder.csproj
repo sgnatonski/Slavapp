@@ -42,9 +42,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Caliburn.Micro.3.0.0-alpha\lib\net45\Caliburn.Micro.Platform.Core.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.1.3.98, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ExifLib">
+      <HintPath>..\packages\ExifLib.1.6.3.0\lib\net45\ExifLib.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=1.1.3.117, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MahApps.Metro.1.1.3-ALPHA098\lib\net45\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.1.1.3-ALPHA117\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -54,7 +57,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.1.3-ALPHA098\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.1.1.3-ALPHA117\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -67,9 +70,13 @@
   <ItemGroup>
     <Compile Include="Actions\Loader.cs" />
     <Compile Include="Actions\SimilarityRunAction.cs" />
+    <Compile Include="Controls\ImageActionPopup.xaml.cs">
+      <DependentUpon>ImageActionPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ImageCache.cs" />
     <Compile Include="ImageConverter.cs" />
     <Compile Include="ImageFinderPlugin.cs" />
+    <Compile Include="ItemsCountVisibilityConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimilarityModel.cs" />
     <Compile Include="ViewModels\ResultViewModel.cs" />
@@ -83,6 +90,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Resources\Entypo.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageFinder\ImageFinder.csproj">
@@ -107,8 +115,18 @@
     <Content Include="Lib\zlib1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Entypo-license.txt" />
+    <Content Include="Resources\WindowsIcons-license.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\ImageActionPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
