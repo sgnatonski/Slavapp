@@ -57,7 +57,7 @@ namespace SlavApp.Minion.ImageFinder
             var e = new List<ExifData>();
             try
             {
-                using (var reader = new ExifReader(Name))
+                /*using (var reader = new ExifReader(Name))
                 {
                     // Extract the tag data using the ExifTags enumeration
                     DateTime datePictureTaken;
@@ -75,7 +75,7 @@ namespace SlavApp.Minion.ImageFinder
                     {
                         e.Add(new ExifData() { Key = "Height", Value = imgHeight.ToString() });
                     }
-                }
+                }*/
             }
             catch(ExifLibException eex)
             {

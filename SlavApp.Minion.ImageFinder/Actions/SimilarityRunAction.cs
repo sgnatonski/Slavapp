@@ -33,10 +33,10 @@ namespace SlavApp.Minion.ImageFinder.Actions
         {
             this.CanRun = true;
             await this.simFinder.Initialize();
-            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", () => this.CanRun));
+            await Task.Run(() => this.simFinder.Run(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", () => this.CanRun));
 
             await this.simComparer.Initialize();
-            await Task.Run(() => this.simComparer.Run(this.DirectoryName, "*.jpg", SimilarityLevel, () => this.CanRun));
+            await Task.Run(() => this.simComparer.Run(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", SimilarityLevel, () => this.CanRun));
 
             Completed(this, new ResultCompletionEventArgs());
         }

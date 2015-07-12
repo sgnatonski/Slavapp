@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+using System.Windows;
 
 namespace SlavApp.Minion.ImageFinder
 {
@@ -20,13 +21,24 @@ namespace SlavApp.Minion.ImageFinder
                 BitmapImage bmp = null;
                 if (!imgCache.TryGetValue(value.ToString(), out bmp) || bmp == null)
                 {
-                    bmp = new BitmapImage();
-                    bmp.BeginInit();
-                    bmp.UriSource = new Uri(value.ToString());
-                    bmp.DecodePixelWidth = 100;
-                    bmp.EndInit();
+                    try
+                    {
+                        bmp = new BitmapImage();
+                        bmp.BeginInit();
+                        bmp.UriSource = new Uri(value.ToString());
+                        bmp.DecodePixelWidth = 100;
+                        bmp.EndInit();
 
-                    imgCache.Add(value.ToString(), bmp);
+                        imgCache.Add(value.ToString(), bmp);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        var sri = Application.GetResourceStream(new Uri("/SlavApp.Minion.ImageFinder;component/Resources/NoImage.jpg", UriKind.Relative));
+                        bmp = new BitmapImage();
+                        bmp.BeginInit();
+                        bmp.StreamSource = sri.Stream;
+                        bmp.EndInit();
+                    }
                 }
                 return bmp;
             }
