@@ -25,5 +25,17 @@ namespace SlavApp.Minion.ImageFinder.Controls
         {
             InitializeComponent();
         }
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            var model = (SimilarityModel)this.DataContext;
+            model.ShowImage();
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            var model = (SimilarityModel)this.DataContext;
+            model.ShowImage();
+        }
     }
 }

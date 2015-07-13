@@ -54,16 +54,24 @@ namespace ImageFinder
             {
                 if (continueTest())
                 {
-                    var result = tree.searchVPTree(dict[f], 10, distance);
-                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
-
-                    if (files.Any(x => x != f))
+                    ulong hash = 0;
+                    if (dict.TryGetValue(f, out hash))
                     {
-                        OnCompareProgress(allfiles.Count(), f, files, 0);
+                        var result = tree.searchVPTree(hash, 10, distance);
+                        var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
+
+                        if (files.Any(x => x != f))
+                        {
+                            OnCompareProgress(allfiles.Count(), f, files, 0);
+                        }
+                        else
+                        {
+                            OnCompareProgress(allfiles.Count(), null, null, 0);
+                        }
                     }
                     else
                     {
-                        OnCompareProgress(allfiles.Count(), null, null, 0);
+                        // todo:
                     }
                 }
             });

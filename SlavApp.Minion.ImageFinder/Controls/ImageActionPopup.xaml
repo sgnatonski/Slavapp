@@ -20,7 +20,7 @@
         <StackPanel.Effect>
             <DropShadowEffect BlurRadius="8" ShadowDepth="5"/>
         </StackPanel.Effect>
-        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}">
+        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}" Click="Open_Click">
             <StackPanel>
                 <Rectangle Width="32" Height="32">
                     <Rectangle.Fill>
@@ -30,17 +30,7 @@
                 <TextBlock Text="Open file"/>
             </StackPanel>
         </Button>
-        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}">
-            <StackPanel>
-                <Rectangle Width="32" Height="32">
-                    <Rectangle.Fill>
-                        <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_image_gallery}" />
-                    </Rectangle.Fill>
-                </Rectangle>
-                <TextBlock Text="View images"/>
-            </StackPanel>
-        </Button>
-        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}">
+        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}" Click="Delete_Click">
             <StackPanel>
                 <Rectangle Width="32" Height="32">
                     <Rectangle.Fill>

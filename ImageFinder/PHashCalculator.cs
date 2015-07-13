@@ -54,12 +54,18 @@ namespace ImageFinder
             var pcData = tran.Select<string, ulong>("hash", filename);
             if (!pcData.Exists)
             {
-                ulong hash = 0;
-                var sw = Stopwatch.StartNew();
-                ph_dct_imagehash(filename, ref hash);
-                Debug.WriteLine(string.Format("ph_dct_imagehash: {0} ms", sw.ElapsedMilliseconds));
-                tran.Insert("hash", filename, hash);
-                return hash;
+                try
+                {
+                    ulong hash = 0;
+                    var sw = Stopwatch.StartNew();
+                    ph_dct_imagehash(filename, ref hash);
+                    Debug.WriteLine(string.Format("ph_dct_imagehash: {0} ms", sw.ElapsedMilliseconds));
+                    tran.Insert("hash", filename, hash);
+                    return hash;
+                }
+                catch (Exception)
+                {
+                }
             }
             return pcData.Value;
         }

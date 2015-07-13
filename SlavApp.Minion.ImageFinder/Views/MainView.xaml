@@ -114,7 +114,7 @@
                                     <RowDefinition Height="460"/>
                                     <RowDefinition Height="20"/>
                                 </Grid.RowDefinitions>
-                                <Image Source="{Binding Path=Name, Converter={StaticResource imgConverter}, ConverterParameter=False, IsAsync=true}" Stretch="UniformToFill"></Image>
+                                <Image Source="{Binding Path=Name, Converter={StaticResource imgConverter}, ConverterParameter=False, IsAsync=true}" Stretch="Uniform"></Image>
                                 <ListView Grid.Column="1" Background="White" ItemsSource="{Binding Exif}">
                                     <ListView.View>
                                         <GridView>
@@ -129,7 +129,7 @@
                                     </ListView.View>
                                 </ListView>
                                 <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Name}" Background="White" Foreground="Blue" Padding="2 0"/>
-                                <lc:ImageActionPopup x:Name="TilePopup" StaysOpen="False" PopupAnimation="Slide" />
+                                <lc:ImageActionPopup x:Name="TilePopup" StaysOpen="False" PopupAnimation="Slide" DataContext="{Binding}" Placement="Center"/>
                             </Grid>
                             <Controls:Tile.Triggers>
                                 <EventTrigger RoutedEvent="Controls:Tile.Click">

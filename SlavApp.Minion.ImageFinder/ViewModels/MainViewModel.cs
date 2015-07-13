@@ -133,7 +133,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 {
                     return Enumerable.Empty<ResultViewModel>().ToList();
                 }
-                var r = this.Results.Select(x => x.Value).OrderByDescending(x => x.Similar.Count).ToList();
+                var r = this.Results.Select(x => x.Value).Where(x => x.Similar.Count > 1).OrderByDescending(x => x.Similar.Count).ToList();
                 return r;
             }
         }
@@ -210,7 +210,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
                 if (!this.Results.ContainsKey(ea.File1))
                 {
                     var r = new ResultViewModel(new SimilarityModel() { Name = ea.File1 });
-                    r.Similar.AddRange(ea.File2.Select(x => new SimilarityModel() { Name = x }));
+                    r.Similar.AddRange(ea.File2.Where(x => !this.Results.ContainsKey(x)).Select(x => new SimilarityModel() { Name = x }));
                     this.Results.Add(ea.File1, r);
                 }
             }

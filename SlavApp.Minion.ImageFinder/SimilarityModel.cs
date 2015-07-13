@@ -23,6 +23,10 @@ namespace SlavApp.Minion.ImageFinder
             get { return name; }
             set
             {
+                if (this.name != value)
+                {
+                    this.exifLoaded = false;
+                }
                 this.name = value;
                 NotifyOfPropertyChange(() => Name);
                 NotifyOfPropertyChange(() => FileName);
