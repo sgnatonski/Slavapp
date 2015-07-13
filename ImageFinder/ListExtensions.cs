@@ -114,5 +114,10 @@ namespace ImageFinder
             list.RemoveRange(offset, count);
             return itemsRemoved;
         }
+
+        public static Dictionary<TV, List<TK>> Flip<TK, TV>(this Dictionary<TK, TV> dict)
+        {
+            return dict.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
+        }
     }
 }

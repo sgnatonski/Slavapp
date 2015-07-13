@@ -44,7 +44,7 @@ namespace ImageFinder
             using (var tran = engine.GetTransaction())
             {
                 dict = tran.SelectForward<string, ulong>("hash").ToDictionary(x => x.Key, y => y.Value);
-                hashes = dict.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
+                hashes = dict.Flip();
             }
             var hashesArray = hashes.Keys.ToArray();
 
