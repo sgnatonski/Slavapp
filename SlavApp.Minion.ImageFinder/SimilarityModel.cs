@@ -17,6 +17,7 @@ namespace SlavApp.Minion.ImageFinder
         private string name;
         private double value;
         private ObservableCollection<ExifData> exif;
+        private bool exifLoaded;
         public string Name
         {
             get { return name; }
@@ -25,7 +26,7 @@ namespace SlavApp.Minion.ImageFinder
                 this.name = value;
                 NotifyOfPropertyChange(() => Name);
                 NotifyOfPropertyChange(() => FileName);
-                UpdateExif();
+                NotifyOfPropertyChange(() => Exif);
             }
         }
         public string FileName
@@ -44,11 +45,23 @@ namespace SlavApp.Minion.ImageFinder
 
         public ObservableCollection<ExifData> Exif
         {
-            get { return exif; }
-            set
+            get 
+            { 
+                if (!exifLoaded)
+                {
+                    exifLoaded = true;
+                    UpdateExif();
+                }
+                return exif; 
+            }
+        }
+
+        private void GetExifTag(ExifReader reader, ExifTags tag, string title, List<ExifData> list)
+        {
+            object value = null;
+            if (reader.GetTagValue<object>(tag, out value))
             {
-                this.exif = value;
-                NotifyOfPropertyChange(() => Exif);
+                list.Add(new ExifData() { Key = title, Value = value.ToString() });
             }
         }
 
@@ -57,31 +70,23 @@ namespace SlavApp.Minion.ImageFinder
             var e = new List<ExifData>();
             try
             {
-                /*using (var reader = new ExifReader(Name))
+                using (var reader = new ExifReader(Name))
                 {
-                    // Extract the tag data using the ExifTags enumeration
-                    DateTime datePictureTaken;
-                    if (reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized, out datePictureTaken))
-                    {
-                        e.Add(new ExifData() { Key = "Date taken", Value = datePictureTaken.ToString() });
-                    }
-                    double imgWidth;
-                    if (reader.GetTagValue<double>(ExifTags.XResolution, out imgWidth))
-                    {
-                        e.Add(new ExifData() { Key = "Width", Value = imgWidth.ToString() });
-                    }
-                    double imgHeight;
-                    if (reader.GetTagValue<double>(ExifTags.YResolution, out imgHeight))
-                    {
-                        e.Add(new ExifData() { Key = "Height", Value = imgHeight.ToString() });
-                    }
-                }*/
+                    GetExifTag(reader, ExifTags.ImageUniqueID, "ID", e);
+                    GetExifTag(reader, ExifTags.DateTimeDigitized, "Date taken", e);
+                    GetExifTag(reader, ExifTags.PixelXDimension, "Width", e);
+                    GetExifTag(reader, ExifTags.PixelYDimension, "Height", e);
+                    GetExifTag(reader, ExifTags.XResolution, "X Resolution", e);
+                    GetExifTag(reader, ExifTags.YResolution, "Y Resolution", e);
+                    GetExifTag(reader, ExifTags.Make, "Device", e);
+                    GetExifTag(reader, ExifTags.Model, "Device model", e);
+                }
             }
             catch(ExifLibException eex)
             {
 
             }
-            this.Exif = new ObservableCollection<ExifData>(e);
+            this.exif = new ObservableCollection<ExifData>(e);
         }
 
         public void ShowImage()

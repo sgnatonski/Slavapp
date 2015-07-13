@@ -60,6 +60,7 @@
     <Compile Include="ImageUtility.cs" />
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
+    <Compile Include="Pathing.cs" />
     <Compile Include="PHashComparer.cs" />
     <Compile Include="PriorityQueue.cs" />
     <Compile Include="RgbProjections.cs" />

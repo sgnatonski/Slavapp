@@ -9,7 +9,7 @@
              xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="AliceBlue">
+             Background="WhiteSmoke">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -24,12 +24,11 @@
             <local:ItemsCountVisibilityConverter x:Key="itemsConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid Margin="4">
         <Grid Name="container">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -39,12 +38,27 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBox Grid.Column="0" x:Name="DirectoryName" Margin="2 2 3 2"></TextBox>
+            <TextBox Grid.Column="0" x:Name="DirectoryName" Margin="2 2 18 2"></TextBox>
             <Button Grid.Column="0" x:Name="SelectDirectory" Content="..." Margin="0 2 2 2" HorizontalAlignment="Right"></Button>
-            <Controls:NumericUpDown Grid.Column="2" Value="{Binding SimLevel}" Margin="2"></Controls:NumericUpDown>
-            <Button Grid.Row="1" Grid.Column="2" x:Name="Run" Content="Run" Margin="2" Style="{StaticResource AccentedSquareButtonStyle}"></Button>
-            <ScrollViewer  Grid.Row="4" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Auto">
-                <ItemsControl x:Name="List" Margin="2">
+            <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Margin="2">
+                <StackPanel Background="White">
+                    <Slider Interval="1" Maximum="20" Minimum="0" Value="{Binding SimLevel}" TickPlacement="BottomRight" TickFrequency="2" Margin="0 8 0 0"></Slider>
+                    <TextBlock x:Name="SimLevelDescription" FontWeight="Bold" HorizontalAlignment="Stretch" TextAlignment="Center" Margin="0 4 0 8" />
+                </StackPanel>
+            </Border>
+            <Button Grid.Row="1" Grid.Column="1" x:Name="Run" Margin="2" Style="{StaticResource AccentedSquareButtonStyle}" Height="60" Width="60" VerticalAlignment="Top">
+                <Rectangle Width="48" Height="48">
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{StaticResource appbar_magnify_browse}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Button>
+            <Line Grid.Row="3" Grid.ColumnSpan="2" Margin="0 4 0 0" Stroke="Black" Stretch="Fill" StrokeThickness="1" X1="0" X2="1"></Line>
+            <ScrollViewer  Grid.Row="4" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer.Background>
+                    <SolidColorBrush Color="LightGray"/>
+                </ScrollViewer.Background>
+                <ItemsControl x:Name="List" Margin="2" VirtualizingPanel.IsVirtualizing="True">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel/>
@@ -55,21 +69,23 @@
                             <Controls:Tile Width="150" Height="120" 
                                        cal:Message.Attach="[Event Click] = [Action ShowSimilarImages($dataContext)]"
                                        cal:Action.TargetWithoutContext="{Binding DataContext, ElementName=container}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="50"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="100"/>
-                                        <RowDefinition Height="20"/>
-                                    </Grid.RowDefinitions>
-                                    <Image Source="{Binding Path=Model.Name, Converter={StaticResource imgConverter}, IsAsync=true}" Stretch="UniformToFill"></Image>
-                                    <Grid Grid.Column="1" Background="White">
-                                        <TextBlock Text="{Binding SimilarCount}" FontSize="26" Foreground="Green" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                                <Border BorderBrush="Black" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="100"/>
+                                            <RowDefinition Height="20"/>
+                                        </Grid.RowDefinitions>
+                                        <Image Source="{Binding Path=Model.Name, Converter={StaticResource imgConverter}, ConverterParameter=True, IsAsync=true}" Stretch="UniformToFill"></Image>
+                                        <Grid Grid.Column="1" Background="White">
+                                            <TextBlock Text="{Binding SimilarCount}" FontSize="26" Foreground="Green" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                                        </Grid>
+                                        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Model.FileName}" Background="White" Foreground="Blue"/>
                                     </Grid>
-                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Model.FileName}" Background="White" Foreground="Blue" Padding="2 0"/>
-                                </Grid>
+                                </Border>
                             </Controls:Tile>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -83,14 +99,13 @@
             <ItemsControl x:Name="Similar" Margin="2">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical">
-                        </StackPanel>
+                        <VirtualizingStackPanel Orientation="Vertical"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Controls:Tile Width="800" Height="480" x:Name="tile" Background="Transparent">
-                            <Grid Opacity="1">
+                            <Grid Opacity="1" Background="White">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="600"/>
                                     <ColumnDefinition Width="200"/>
@@ -99,7 +114,7 @@
                                     <RowDefinition Height="460"/>
                                     <RowDefinition Height="20"/>
                                 </Grid.RowDefinitions>
-                                <Image Source="{Binding Path=Name}" Stretch="UniformToFill"></Image>
+                                <Image Source="{Binding Path=Name, Converter={StaticResource imgConverter}, ConverterParameter=False, IsAsync=true}" Stretch="UniformToFill"></Image>
                                 <ListView Grid.Column="1" Background="White" ItemsSource="{Binding Exif}">
                                     <ListView.View>
                                         <GridView>

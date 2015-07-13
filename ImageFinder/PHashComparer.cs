@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ImageFinder
 {
-    public class PHashComparer : IDisposable
+    public class PHashComparer
     {
         [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
@@ -23,55 +23,27 @@ namespace ImageFinder
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        private readonly DBreezeConfiguration memConf = new DBreezeConfiguration()
-        {
-            Storage = DBreezeConfiguration.eStorage.MEMORY
-        };
-
-        private DBreezeEngine memoryEngine;
-        private bool isInitialized = false;
-
         static PHashComparer()
         {
             DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
             DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = ListExtenstions.DeserializeProtobuf;
         }
 
-        public async Task Initialize()
+        public void Run(string directory, string filter, int distance)
         {
-            if (this.isInitialized)
-            {
-                return;
-            }
-
-            await Task.Run(() =>
-            {
-                this.memoryEngine = new DBreezeEngine(memConf);
-
-                using (var engine = new DBreezeEngine(dbConf))
-                {
-                    LoadFromDb(engine);
-                };
-            });
-
-            this.isInitialized = true;
+            this.Run(directory, filter, distance, () => true);
         }
 
-        public void Run(string directory, string filter, double minSimilarity)
+        public void Run(string directory, string filter, int distance, Func<bool> continueTest)
         {
-            this.Run(directory, filter, minSimilarity, () => true);
-        }
-
-        public void Run(string directory, string filter, double minSimilarity, Func<bool> continueTest)
-        {
-            var maxSimilarityDistance = 20 - (int)(20 * (minSimilarity / 100.0));
-            var allfiles = System.IO.Directory.GetFiles(directory, filter, System.IO.SearchOption.AllDirectories);
+            var allfiles = System.IO.Directory.GetFiles(Pathing.GetUNCPath(directory), filter, System.IO.SearchOption.AllDirectories);
 
             Dictionary<string, ulong> dict = null;
             Dictionary<ulong, List<string>> hashes = null;
-            using (var tMemory = this.memoryEngine.GetTransaction())
+            using (var engine = new DBreezeEngine(dbConf))
+            using (var tran = engine.GetTransaction())
             {
-                dict = tMemory.SelectForward<string, ulong>("hash").ToDictionary(x => x.Key, y => y.Value);
+                dict = tran.SelectForward<string, ulong>("hash").ToDictionary(x => x.Key, y => y.Value);
                 hashes = dict.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
             }
             var hashesArray = hashes.Keys.ToArray();
@@ -82,8 +54,8 @@ namespace ImageFinder
             {
                 if (continueTest())
                 {
-                    var result = tree.searchVPTree(dict[f], 10, maxSimilarityDistance);
-                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).ToArray();
+                    var result = tree.searchVPTree(dict[f], 10, distance);
+                    var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
 
                     if (files.Any(x => x != f))
                     {
@@ -95,27 +67,6 @@ namespace ImageFinder
                     }
                 }
             });
-        }
-
-        private void LoadFromDb(DBreezeEngine engine)
-        {
-            using (var tran = engine.GetTransaction())
-            using (var tMemory = this.memoryEngine.GetTransaction())
-            {
-                foreach (var row in tran.SelectForward<string, ulong>("hash"))
-                {
-                    tMemory.Insert("hash", row.Key, row.Value);
-                }
-                tMemory.Commit();
-            }
-        }
-
-        public void Dispose()
-        {
-            if (this.memoryEngine != null)
-            {
-                this.memoryEngine.Dispose();
-            }
         }
     }
 }

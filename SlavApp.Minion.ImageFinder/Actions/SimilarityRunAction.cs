@@ -22,7 +22,7 @@ namespace SlavApp.Minion.ImageFinder.Actions
         }
 
         public string DirectoryName { get; set; }
-        public double SimilarityLevel { get; set; }
+        public int MaxDistance { get; set; }
         public bool CanRun { get; set; }
 
         public event EventHandler<ResultCompletionEventArgs> Completed = delegate { };
@@ -32,11 +32,8 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public async void Execute(CoroutineExecutionContext context)
         {
             this.CanRun = true;
-            await this.simFinder.Initialize();
-            await Task.Run(() => this.simFinder.Run(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", () => this.CanRun));
-
-            await this.simComparer.Initialize();
-            await Task.Run(() => this.simComparer.Run(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", SimilarityLevel, () => this.CanRun));
+            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", () => this.CanRun));
+            await Task.Run(() => this.simComparer.Run(this.DirectoryName, "*.jpg", MaxDistance, () => this.CanRun));
 
             Completed(this, new ResultCompletionEventArgs());
         }

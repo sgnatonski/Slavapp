@@ -33,7 +33,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.Completed += a_Completed;
 
             this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
-            this.SimLevel = 85;
+            this.SimLevel = 3;
             eventTimer.Interval = 125;
             eventTimer.Elapsed += eventTimer_Elapsed;
         }
@@ -64,7 +64,52 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             set
             {
                 this.simLevel = value;
+                if (this.simLevel > 20)
+                    this.simLevel = 20;
+                if (this.simLevel < 0)
+                    this.simLevel = 0;
                 NotifyOfPropertyChange(() => SimLevel);
+                NotifyOfPropertyChange(() => SimLevelDescription);
+            }
+        }
+        
+        public string SimLevelDescription
+        {
+            get 
+            { 
+                switch(this.SimLevel)
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        return "Identical pictures";
+                    case 3:
+                    case 4:
+                    case 5:
+                        return "Almost identical pictures";
+                    case 6:
+                    case 7:
+                    case 8:
+                        return "Very similar pictures";
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                        return "Similar pictures";
+                    case 13:
+                    case 14:
+                    case 15:
+                        return "Related pictures";
+                    case 16:
+                    case 17:
+                    case 18:
+                        return "Somewhat related pictures";
+                    case 19:
+                    case 20:
+                        return "Almost unrelated pictures";
+                    default:
+                        return "";
+                }
             }
         }
 
@@ -107,6 +152,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         public void SelectDirectory()
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            dialog.SelectedPath = this.DirectoryName;
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
@@ -124,7 +170,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.progressVM.ShowProgress();
             this.progressVM.UpdateProgress("[ 1 / 3 ] Starting analysis", 0, 1);
             this.sAction.DirectoryName = this.DirectoryName;
-            this.sAction.SimilarityLevel = (double)this.SimLevel;
+            this.sAction.MaxDistance = this.SimLevel;
 
             eventTimer.Start();
 
