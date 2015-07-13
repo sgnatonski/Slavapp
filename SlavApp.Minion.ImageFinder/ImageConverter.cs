@@ -15,7 +15,6 @@ namespace SlavApp.Minion.ImageFinder
 {
     public class ImgConverter : IValueConverter
     {
-        private static ImageCache imgCache = new ImageCache();
         private static ImageCache thumbImgCache = new ImageCache();
         private static StreamResourceInfo sri;
         private static BitmapImage noImageBmp;
@@ -25,15 +24,21 @@ namespace SlavApp.Minion.ImageFinder
            {
                if (noImageBmp == null)
                {
-                   sri = Application.GetResourceStream(new Uri("/SlavApp.Minion.ImageFinder;component/Resources/NoImage.jpg", UriKind.Relative));
-                   noImageBmp = new BitmapImage();
-                   noImageBmp.BeginInit();
-                   noImageBmp.StreamSource = sri.Stream;
-                   noImageBmp.EndInit();
+                    sri = Application.GetResourceStream(new Uri("/SlavApp.Minion.ImageFinder;component/Resources/NoImage.jpg", UriKind.Relative));
+                    noImageBmp = new BitmapImage();
+                    noImageBmp.BeginInit();
+                    noImageBmp.StreamSource = sri.Stream;
+                    noImageBmp.EndInit();
+                    noImageBmp.Freeze();
                }
 
                return noImageBmp;
            }
+        }
+
+        public static void PurgeThumbCache()
+        {
+            thumbImgCache = new ImageCache();
         }
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -53,6 +58,7 @@ namespace SlavApp.Minion.ImageFinder
                             bmp.UriSource = new Uri(value.ToString());
                             bmp.DecodePixelWidth = 100;
                             bmp.EndInit();
+                            bmp.Freeze();
 
                             thumbImgCache.Add(value.ToString(), bmp);
                         }
@@ -68,28 +74,26 @@ namespace SlavApp.Minion.ImageFinder
                 }
                 else
                 {
-                    if (!imgCache.TryGetValue(value.ToString(), out bmp) || bmp == null)
+                    try
                     {
-                        try
-                        {
-                            bmp = new BitmapImage();
-                            bmp.BeginInit();
-                            bmp.UriSource = new Uri(value.ToString());
-                            bmp.EndInit();
-
-                            imgCache.Add(value.ToString(), bmp);
-                        }
-                        catch (FileFormatException)
-                        {
-                            bmp = noImageBmp;
-                        }
-                        catch (NotSupportedException)
-                        {
-                            bmp = noImageBmp;
-                        }
+                        bmp = new BitmapImage();
+                        bmp.BeginInit();
+                        bmp.UriSource = new Uri(value.ToString());
+                        bmp.DecodePixelWidth = 600;
+                        bmp.EndInit();
+                        bmp.Freeze();
+                    }
+                    catch (FileFormatException)
+                    {
+                        bmp = noImageBmp;
+                    }
+                    catch (NotSupportedException)
+                    {
+                        bmp = noImageBmp;
                     }
                 }
 
+                
                 return bmp;
             }
             else
