@@ -23,12 +23,6 @@ namespace ImageFinder
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        static PHashComparer()
-        {
-            DBreeze.Utils.CustomSerializator.ByteArraySerializator = ListExtenstions.SerializeProtobuf;
-            DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = ListExtenstions.DeserializeProtobuf;
-        }
-
         public void Run(string directory, string filter, int distance)
         {
             this.Run(directory, filter, distance, () => true);

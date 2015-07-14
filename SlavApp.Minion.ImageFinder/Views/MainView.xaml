@@ -93,7 +93,7 @@
             </ScrollViewer>
 
         </Grid>
-        <Rectangle Name="Background" Opacity="0.8" Fill="Black" Visibility="{Binding ElementName=Similar, Path=Items.Count, Converter={StaticResource itemsConverter}}"/>
+        <Rectangle Opacity="0.8" Fill="Black" Visibility="{Binding ElementName=Similar, Path=Items.Count, Converter={StaticResource itemsConverter}}"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding ElementName=Similar, Path=Items.Count, Converter={StaticResource itemsConverter}}"
                       cal:Message.Attach="[Event MouseUp] = [Action HideSimilarImages()]" >
             <ItemsControl x:Name="Similar" Margin="2">

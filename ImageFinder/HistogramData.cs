@@ -1,6 +1,5 @@
 ﻿namespace ImageFinder
 {
-    [ProtoBuf.ProtoContract]
     public class HistogramData
     {
         public HistogramData()
@@ -19,10 +18,8 @@
             this.Y = data2;
         }
 
-        [ProtoBuf.ProtoMember(1, IsRequired = true)]
         public double[] X { get; set; }
 
-        [ProtoBuf.ProtoMember(2, IsRequired = true)]
         public double[] Y { get; set; }
     }
 }
