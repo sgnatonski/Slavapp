@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace ImageFinder
+namespace SlavApp.ImageFinder
 {
     public static class Utils
     {

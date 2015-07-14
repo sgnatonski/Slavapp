@@ -1,4 +1,4 @@
-﻿namespace EyeOpen.Imaging
+﻿namespace SlavApp.ImageFinder
 {
     using System;
     using System.Collections.Generic;

@@ -1,5 +1,5 @@
 ﻿using Caliburn.Micro;
-using ImageFinder;
+using SlavApp.ImageFinder;
 using System;
 using System.Collections.Generic;
 using System.Linq;

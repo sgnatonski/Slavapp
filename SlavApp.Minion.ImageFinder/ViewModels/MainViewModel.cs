@@ -1,5 +1,4 @@
 ﻿using Caliburn.Micro;
-using ImageFinder;
 using SlavApp.Minion.ImageFinder.Actions;
 using SlavApp.Minion.Plugin;
 using System;

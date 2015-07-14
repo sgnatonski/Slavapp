@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ImageFinder
+namespace SlavApp.ImageFinder
 {
     public static class ListExtenstions
     {

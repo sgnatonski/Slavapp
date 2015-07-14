@@ -1,4 +1,5 @@
 ﻿using ExifLib;
+using SlavApp.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,6 +97,11 @@ namespace SlavApp.Minion.ImageFinder
         public void ShowImage()
         {
             Process.Start(this.Name);
+        }
+
+        public void DeleteImage()
+        {
+            FileOperationAPIWrapper.Send(this.Name);
         }
     }
 

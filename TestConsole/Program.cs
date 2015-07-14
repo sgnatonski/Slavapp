@@ -1,4 +1,4 @@
-﻿using ImageFinder;
+﻿using SlavApp.ImageFinder;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

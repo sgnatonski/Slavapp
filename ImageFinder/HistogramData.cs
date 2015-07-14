@@ -1,4 +1,4 @@
-﻿namespace ImageFinder
+﻿namespace SlavApp.ImageFinder
 {
     public class HistogramData
     {

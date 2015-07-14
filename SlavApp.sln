@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Mail", "Notif
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion", "SlavApp.Minion\SlavApp.Minion.csproj", "{371F1028-DD21-45E7-9948-14B23B2C2816}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageFinder", "ImageFinder\ImageFinder.csproj", "{FDAAFEC9-D7D2-4BAC-A119-CF50C66737CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.ImageFinder", "ImageFinder\SlavApp.ImageFinder.csproj", "{FDAAFEC9-D7D2-4BAC-A119-CF50C66737CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{2583C168-48FA-44D4-81F4-27EF4EA1086F}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.Plugin", "SlavApp.Minion.Plugin\SlavApp.Minion.Plugin.csproj", "{A54DB1CC-BFCA-4F85-8BB1-ECD980CE699C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Minion.ImageCompressor", "SlavApp.Minion.ImageCompressor\SlavApp.Minion.ImageCompressor.csproj", "{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlavApp.Windows", "SlavApp.Windows\SlavApp.Windows.csproj", "{E878F450-178E-46DB-82FF-8338652C1E0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74745AB4-76A6-4AD7-9235-B7D3C02C4C56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E878F450-178E-46DB-82FF-8338652C1E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E878F450-178E-46DB-82FF-8338652C1E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E878F450-178E-46DB-82FF-8338652C1E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E878F450-178E-46DB-82FF-8338652C1E0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

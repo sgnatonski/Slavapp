@@ -1,12 +1,13 @@
 ﻿using DBreeze;
 using DBreeze.Transactions;
+using SlavApp.Windows;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace ImageFinder
+namespace SlavApp.ImageFinder
 {
     public class PHashCalculator
     {

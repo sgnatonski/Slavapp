@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ImageFinder
+namespace SlavApp.ImageFinder
 {
     public class VPTree
     {

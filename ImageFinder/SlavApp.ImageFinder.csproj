@@ -7,8 +7,8 @@
     <ProjectGuid>{FDAAFEC9-D7D2-4BAC-A119-CF50C66737CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageFinder</RootNamespace>
-    <AssemblyName>ImageFinder</AssemblyName>
+    <RootNamespace>SlavApp.ImageFinder</RootNamespace>
+    <AssemblyName>SlavApp.ImageFinder</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -57,7 +57,6 @@
     <Compile Include="ImageUtility.cs" />
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="Pathing.cs" />
     <Compile Include="PHashComparer.cs" />
     <Compile Include="PriorityQueue.cs" />
     <Compile Include="RgbProjections.cs" />
@@ -73,6 +72,12 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SlavApp.Windows\SlavApp.Windows.csproj">
+      <Project>{e878f450-178e-46db-82ff-8338652c1e0a}</Project>
+      <Name>SlavApp.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

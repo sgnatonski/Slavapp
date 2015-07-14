@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2583C168-48FA-44D4-81F4-27EF4EA1086F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E878F450-178E-46DB-82FF-8338652C1E0A}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestConsole</RootNamespace>
-    <AssemblyName>TestConsole</AssemblyName>
+    <RootNamespace>SlavApp.Windows</RootNamespace>
+    <AssemblyName>SlavApp.Windows</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,33 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="FileOperationAPIWrapper.cs" />
+    <Compile Include="Pathing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ImageFinder\SlavApp.ImageFinder.csproj">
-      <Project>{fdaafec9-d7d2-4bac-a119-cf50c66737cf}</Project>
-      <Name>SlavApp.ImageFinder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LinqSpecifications\LinqSpecifications.csproj">
-      <Project>{720818de-7fc2-4132-a3bf-8ed939999eb6}</Project>
-      <Name>LinqSpecifications</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Notifications.Mail\Notifications.Mail.csproj">
-      <Project>{5ccd2662-39c0-4ecf-85c3-41c646a0b71d}</Project>
-      <Name>Notifications.Mail</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Notifications\Notifications.csproj">
-      <Project>{0f00b525-eb3d-48ce-9383-148b6803c212}</Project>
-      <Name>Notifications</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WinProcessWatcher\WinProcessWatcher.csproj">
-      <Project>{6d3cd09f-5855-42cb-b1dd-9ad5efd414d8}</Project>
-      <Name>WinProcessWatcher</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

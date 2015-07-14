@@ -94,13 +94,17 @@
     <None Include="Resources\Entypo.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImageFinder\ImageFinder.csproj">
+    <ProjectReference Include="..\ImageFinder\SlavApp.ImageFinder.csproj">
       <Project>{fdaafec9-d7d2-4bac-a119-cf50c66737cf}</Project>
-      <Name>ImageFinder</Name>
+      <Name>SlavApp.ImageFinder</Name>
     </ProjectReference>
     <ProjectReference Include="..\SlavApp.Minion.Plugin\SlavApp.Minion.Plugin.csproj">
       <Project>{a54db1cc-bfca-4f85-8bb1-ecd980ce699c}</Project>
       <Name>SlavApp.Minion.Plugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SlavApp.Windows\SlavApp.Windows.csproj">
+      <Project>{e878f450-178e-46db-82ff-8338652c1e0a}</Project>
+      <Name>SlavApp.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +141,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(ProjectDir)$(OutDir)SlavApp.Minion.ImageFinder.*" "$(SolutionDir)SlavApp.Minion\bin\Debug\Plugins\ImageFinder\"
-xcopy /y "$(ProjectDir)$(OutDir)ImageFinder.*" "$(SolutionDir)SlavApp.Minion\bin\Debug\Plugins\ImageFinder\"</PostBuildEvent>
+xcopy /y "$(ProjectDir)$(OutDir)SlavApp.ImageFinder.*" "$(SolutionDir)SlavApp.Minion\bin\Debug\Plugins\ImageFinder\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

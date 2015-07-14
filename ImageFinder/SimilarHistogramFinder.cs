@@ -1,13 +1,12 @@
 ﻿using DBreeze;
 using DBreeze.Transactions;
-using EyeOpen.Imaging;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace ImageFinder
+namespace SlavApp.ImageFinder
 {
     public class SimilarHistogramFinder
     {
