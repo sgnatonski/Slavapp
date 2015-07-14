@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DHash.cs" />
     <Compile Include="ImageUtility.cs" />
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
