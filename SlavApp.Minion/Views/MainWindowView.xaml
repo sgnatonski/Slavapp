@@ -14,7 +14,10 @@
             <local:IconResourceConverter x:Key="IconResourceConverter" />
         </ResourceDictionary>
     </Window.Resources>
-    <Controls:MetroWindow.RightWindowCommands>
+    <Controls:MetroWindow.TitleTemplate>
+        <DataTemplate></DataTemplate>
+    </Controls:MetroWindow.TitleTemplate>
+    <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
             <Button cal:Message.Attach="[Event Click] = [Action ShowMain()]">
                 <StackPanel Orientation="Horizontal">
@@ -27,7 +30,7 @@
                 </StackPanel>
             </Button>
         </Controls:WindowCommands>
-    </Controls:MetroWindow.RightWindowCommands>
+    </Controls:MetroWindow.LeftWindowCommands>
     <Grid x:Name="grid">
         <ItemsControl x:Name="Plugins">
             <ItemsControl.ItemsPanel>

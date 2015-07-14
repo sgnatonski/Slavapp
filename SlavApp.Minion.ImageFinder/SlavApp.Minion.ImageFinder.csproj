@@ -73,6 +73,7 @@
     <Compile Include="Controls\ImageActionPopup.xaml.cs">
       <DependentUpon>ImageActionPopup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ViewportAwareScrollViewer.cs" />
     <Compile Include="ImageCache.cs" />
     <Compile Include="ImageConverter.cs" />
     <Compile Include="ImageFinderPlugin.cs" />
