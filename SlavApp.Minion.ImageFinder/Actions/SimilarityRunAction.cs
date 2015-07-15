@@ -50,25 +50,21 @@ namespace SlavApp.Minion.ImageFinder.Actions
             OnPrepareProgress(this, new PrepareEventArgs(this.total));
         }
 
-        private void OnRunProgress(string file1, string[] file2, double value)
+        private void OnRunProgress(Distance[] files)
         {
-            OnCompareProgress(this, new SimilarityRunEventArgs(this.total, file1, file2, value));
+            OnCompareProgress(this, new SimilarityRunEventArgs(this.total, files));
         }
     }
 
     public class SimilarityRunEventArgs :EventArgs
     {
-        public SimilarityRunEventArgs(long total, string file1, string[] file2, double value)
+        public SimilarityRunEventArgs(long total, Distance[] files)
         {
             Total = total;
-            File1 = file1;
-            File2 = file2;
-            Value = value;
+            Files = files;
         }
         public long Total { get; private set; }
-        public string File1 { get; private set; }
-        public string[] File2 { get; private set; }
-        public double Value { get; private set; }
+        public Distance[] Files { get; private set; }
     }
 
     public class PrepareEventArgs : EventArgs

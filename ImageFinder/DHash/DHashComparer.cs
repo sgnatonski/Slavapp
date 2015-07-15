@@ -13,7 +13,7 @@ namespace SlavApp.ImageFinder
         [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
 
-        public delegate void CompareProgressEventHandler(string file1, string[] file2, double value);
+        public delegate void CompareProgressEventHandler(Distance[] file2);
 
         public event CompareProgressEventHandler OnCompareProgress;
 
@@ -49,16 +49,16 @@ namespace SlavApp.ImageFinder
                     ulong hash = 0;
                     if (dict.TryGetValue(f, out hash))
                     {
-                        var result = tree.searchVPTree(hash, 10, distance);
-                        var similarFiles = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
+                        var result = tree.searchVPTree(hash, 10, distance + 1);
+                        var similarFiles = result.Select(x => hashes[hashesArray[x.i]].Select(y => new Distance { DistanceBetween = x.d, Filename1 = f, Filename2 = Pathing.GetUNCPath(y) })).SelectMany(x => x).Distinct().ToArray();
 
-                        if (similarFiles.Any(x => x != f))
+                        if (similarFiles.Any(x => x.Filename2 != f))
                         {
-                            OnCompareProgress(f, similarFiles, 0);
+                            OnCompareProgress(similarFiles);
                         }
                         else
                         {
-                            OnCompareProgress(null, null, 0);
+                            OnCompareProgress(null);
                         }
                     }
                     else

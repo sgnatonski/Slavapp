@@ -204,13 +204,24 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             }
             c++;
             t = ea.Total;
-            if (ea.File1 != null)
+            if (ea.Files != null)
             {
-                if (!this.Results.ContainsKey(ea.File1))
+                foreach(var f in ea.Files)
                 {
-                    var r = new ResultViewModel(new SimilarityModel() { Name = ea.File1 });
-                    r.Similar.AddRange(ea.File2.Where(x => !this.Results.ContainsKey(x)).Select(x => new SimilarityModel() { Name = x }));
-                    this.Results.Add(ea.File1, r);
+                    ResultViewModel r = null;
+                    if (this.Results.TryGetValue(f.Filename1, out r))
+                    {
+                        if (!this.Results.ContainsKey(f.Filename2))
+                        {
+                            r.Similar.Add(new SimilarityModel() { Name = f.Filename2, Value = f.DistanceBetween });
+                        }
+                    }
+                    else
+                    {
+                        r = new ResultViewModel(new SimilarityModel() { Name = f.Filename1 });
+                        r.Similar.Add(new SimilarityModel() { Name = f.Filename2, Value = f.DistanceBetween });
+                        this.Results.Add(f.Filename1, r);
+                    }
                 }
             }
         }

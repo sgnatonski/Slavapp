@@ -60,6 +60,7 @@
     <Compile Include="DHash\DHash.cs" />
     <Compile Include="DHash\DHashCalculator.cs" />
     <Compile Include="DHash\DHashComparer.cs" />
+    <Compile Include="Distance.cs" />
     <Compile Include="ImageUtility.cs" />
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
