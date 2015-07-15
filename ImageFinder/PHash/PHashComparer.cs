@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace SlavApp.ImageFinder.PHash
 {
@@ -14,7 +13,7 @@ namespace SlavApp.ImageFinder.PHash
         [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
 
-        public delegate void CompareProgressEventHandler(long total, string file1, string[] file2, double value);
+        public delegate void CompareProgressEventHandler(string file1, string[] file2, double value);
 
         public event CompareProgressEventHandler OnCompareProgress;
 
@@ -24,15 +23,13 @@ namespace SlavApp.ImageFinder.PHash
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(string directory, string filter, int distance)
+        public void Run(IEnumerable<string> files, int distance)
         {
-            this.Run(directory, filter, distance, () => true);
+            this.Run(files, distance, () => true);
         }
 
-        public void Run(string directory, string filter, int distance, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, int distance, Func<bool> continueTest)
         {
-            var allfiles = System.IO.Directory.GetFiles(Pathing.GetUNCPath(directory), filter, System.IO.SearchOption.AllDirectories);
-
             Dictionary<string, ulong> dict = null;
             Dictionary<ulong, List<string>> hashes = null;
             using (var engine = new DBreezeEngine(dbConf))
@@ -45,7 +42,7 @@ namespace SlavApp.ImageFinder.PHash
 
             var tree = VPTree.Build(hashesArray, ph_hamming_distance);
 
-            allfiles.AsParallel().ForAll(f =>
+            files.AsParallel().ForAll(f =>
             {
                 if (continueTest())
                 {
@@ -53,15 +50,15 @@ namespace SlavApp.ImageFinder.PHash
                     if (dict.TryGetValue(f, out hash))
                     {
                         var result = tree.searchVPTree(hash, 10, distance);
-                        var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
+                        var similarFiles = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
 
-                        if (files.Any(x => x != f))
+                        if (similarFiles.Any(x => x != f))
                         {
-                            OnCompareProgress(allfiles.Count(), f, files, 0);
+                            OnCompareProgress(f, similarFiles, 0);
                         }
                         else
                         {
-                            OnCompareProgress(allfiles.Count(), null, null, 0);
+                            OnCompareProgress(null, null, 0);
                         }
                     }
                     else

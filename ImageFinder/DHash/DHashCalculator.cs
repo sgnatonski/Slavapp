@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace SlavApp.ImageFinder.DHash
 {
     public class DHashCalculator
     {
-        public delegate void ProgressEventHandler(long total);
+        public delegate void ProgressEventHandler();
 
         public event ProgressEventHandler OnProgress;
 
@@ -22,12 +21,12 @@ namespace SlavApp.ImageFinder.DHash
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(IEnumerable<string> files, int filesCount)
+        public void Run(IEnumerable<string> files)
         {
-            this.Run(files, filesCount, () => true);
+            this.Run(files, () => true);
         }
 
-        public void Run(IEnumerable<string> files, int filesCount, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, Func<bool> continueTest)
         {
             using (var engine = new DBreezeEngine(dbConf))
             {
@@ -40,7 +39,7 @@ namespace SlavApp.ImageFinder.DHash
                             GetHash(tran, Pathing.GetUNCPath(f));
                             tran.Commit();
                         }
-                        OnProgress(filesCount);
+                        OnProgress();
                     }
                 });
             }

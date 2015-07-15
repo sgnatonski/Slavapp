@@ -31,26 +31,28 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public event EventHandler<SimilarityRunEventArgs> OnCompareProgress = delegate { };
         public event EventHandler<PrepareEventArgs> OnPrepareProgress = delegate { };
 
+        private int total;
+
         public async void Execute(CoroutineExecutionContext context)
         {
             this.CanRun = true;
             var allfiles = System.IO.Directory.EnumerateFiles(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", System.IO.SearchOption.AllDirectories);
-            var filesCount = await Task.Run<int>(() => allfiles.Count());
+            this.total = await Task.Run<int>(() => allfiles.Count());
 
-            await Task.Run(() => this.simFinder.Run(allfiles, filesCount, () => this.CanRun));
-            await Task.Run(() => this.simComparer.Run(allfiles, filesCount, MaxDistance, () => this.CanRun));
+            await Task.Run(() => this.simFinder.Run(allfiles, () => this.CanRun));
+            await Task.Run(() => this.simComparer.Run(allfiles, MaxDistance, () => this.CanRun));
 
             Completed(this, new ResultCompletionEventArgs());
         }
 
-        private void OnPrepProgress(long total)
+        private void OnPrepProgress()
         {
-            OnPrepareProgress(this, new PrepareEventArgs(total));
+            OnPrepareProgress(this, new PrepareEventArgs(this.total));
         }
 
-        private void OnRunProgress(long total, string file1, string[] file2, double value)
+        private void OnRunProgress(string file1, string[] file2, double value)
         {
-            OnCompareProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
+            OnCompareProgress(this, new SimilarityRunEventArgs(this.total, file1, file2, value));
         }
     }
 

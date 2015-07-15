@@ -2,6 +2,7 @@
 using DBreeze.Transactions;
 using SlavApp.Windows;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -24,18 +25,16 @@ namespace SlavApp.ImageFinder.PHash
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(string directory, string filter)
+        public void Run(IEnumerable<string> files, int filesCount)
         {
-            this.Run(directory, filter, () => true);
+            this.Run(files, filesCount, () => true);
         }
 
-        public void Run(string directory, string filter, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, int filesCount, Func<bool> continueTest)
         {
-            var allfiles = System.IO.Directory.GetFiles(Pathing.GetUNCPath(directory), filter, System.IO.SearchOption.AllDirectories);
-
             using (var engine = new DBreezeEngine(dbConf))
             {
-                allfiles.AsParallel().ForAll(f =>
+                files.AsParallel().ForAll(f =>
                 {
                     if (continueTest())
                     {
@@ -44,7 +43,7 @@ namespace SlavApp.ImageFinder.PHash
                             GetHash(tran, Pathing.GetUNCPath(f));
                             tran.Commit();
                         }
-                        OnProgress(allfiles.Length);
+                        OnProgress(filesCount);
                     }
                 });
             }

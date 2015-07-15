@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace SlavApp.ImageFinder
 {
@@ -13,8 +12,8 @@ namespace SlavApp.ImageFinder
     {
         [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ph_hamming_distance(ulong hasha, ulong hashb);
-        
-        public delegate void CompareProgressEventHandler(long total, string file1, string[] file2, double value);
+
+        public delegate void CompareProgressEventHandler(string file1, string[] file2, double value);
 
         public event CompareProgressEventHandler OnCompareProgress;
 
@@ -24,12 +23,12 @@ namespace SlavApp.ImageFinder
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(IEnumerable<string> files, int filesCount, int distance)
+        public void Run(IEnumerable<string> files, int distance)
         {
-            this.Run(files, filesCount, distance, () => true);
+            this.Run(files, distance, () => true);
         }
 
-        public void Run(IEnumerable<string> files, int filesCount, int distance, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, int distance, Func<bool> continueTest)
         {
             Dictionary<string, ulong> dict = null;
             Dictionary<ulong, List<string>> hashes = null;
@@ -55,11 +54,11 @@ namespace SlavApp.ImageFinder
 
                         if (similarFiles.Any(x => x != f))
                         {
-                            OnCompareProgress(filesCount, f, similarFiles, 0);
+                            OnCompareProgress(f, similarFiles, 0);
                         }
                         else
                         {
-                            OnCompareProgress(filesCount, null, null, 0);
+                            OnCompareProgress(null, null, 0);
                         }
                     }
                     else

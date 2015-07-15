@@ -1,5 +1,4 @@
-﻿
-//
+﻿//
 // System.Collections.Specialized.BitVector32.cs
 //
 // Author:
