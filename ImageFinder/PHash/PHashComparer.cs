@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace SlavApp.ImageFinder
+namespace SlavApp.ImageFinder.PHash
 {
     public class PHashComparer
     {

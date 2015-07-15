@@ -47,6 +47,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,14 +55,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DHash.cs" />
+    <Compile Include="Any64.cs" />
+    <Compile Include="BitVector64.cs" />
+    <Compile Include="DHash\DHash.cs" />
+    <Compile Include="DHash\DHashCalculator.cs" />
+    <Compile Include="DHash\DHashComparer.cs" />
     <Compile Include="ImageUtility.cs" />
     <Compile Include="ComparableImage.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="PHashComparer.cs" />
+    <Compile Include="PHash\PHashComparer.cs" />
     <Compile Include="PriorityQueue.cs" />
     <Compile Include="RgbProjections.cs" />
-    <Compile Include="PHashCalculator.cs" />
+    <Compile Include="PHash\PHashCalculator.cs" />
     <Compile Include="SimilarHistogramFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimilarityImages.cs" />

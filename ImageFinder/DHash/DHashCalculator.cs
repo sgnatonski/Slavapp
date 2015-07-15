@@ -7,13 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace SlavApp.ImageFinder
+namespace SlavApp.ImageFinder.DHash
 {
-    public class PHashCalculator
+    public class DHashCalculator
     {
-        [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int ph_dct_imagehash(string file, ref ulong hash);
-
         public delegate void ProgressEventHandler(long total);
 
         public event ProgressEventHandler OnProgress;
@@ -52,16 +49,15 @@ namespace SlavApp.ImageFinder
 
         private static ulong GetHash(Transaction tran, string filename)
         {
-            var pcData = tran.Select<string, ulong>("hash", filename);
+            var pcData = tran.Select<string, ulong>("dhash", filename);
             if (!pcData.Exists)
             {
                 try
                 {
-                    ulong hash = 0;
                     var sw = Stopwatch.StartNew();
-                    ph_dct_imagehash(filename, ref hash);
-                    Debug.WriteLine(string.Format("ph_dct_imagehash: {0} ms", sw.ElapsedMilliseconds));
-                    tran.Insert("hash", filename, hash);
+                    var hash = new DHash().Compute(filename);
+                    Debug.WriteLine(string.Format("DHash().Compute: {0} ms", sw.ElapsedMilliseconds));
+                    tran.Insert("dhash", filename, hash);
                     return hash;
                 }
                 catch (Exception)
