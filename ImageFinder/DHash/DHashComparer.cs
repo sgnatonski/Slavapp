@@ -24,15 +24,13 @@ namespace SlavApp.ImageFinder
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(string directory, string filter, int distance)
+        public void Run(IEnumerable<string> files, int filesCount, int distance)
         {
-            this.Run(directory, filter, distance, () => true);
+            this.Run(files, filesCount, distance, () => true);
         }
 
-        public void Run(string directory, string filter, int distance, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, int filesCount, int distance, Func<bool> continueTest)
         {
-            var allfiles = System.IO.Directory.GetFiles(Pathing.GetUNCPath(directory), filter, System.IO.SearchOption.AllDirectories);
-
             Dictionary<string, ulong> dict = null;
             Dictionary<ulong, List<string>> hashes = null;
             using (var engine = new DBreezeEngine(dbConf))
@@ -45,7 +43,7 @@ namespace SlavApp.ImageFinder
 
             var tree = VPTree.Build(hashesArray, ph_hamming_distance);
 
-            allfiles.AsParallel().ForAll(f =>
+            files.AsParallel().ForAll(f =>
             {
                 if (continueTest())
                 {
@@ -53,15 +51,15 @@ namespace SlavApp.ImageFinder
                     if (dict.TryGetValue(f, out hash))
                     {
                         var result = tree.searchVPTree(hash, 10, distance);
-                        var files = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
+                        var similarFiles = result.Select(x => hashesArray[x.i]).Distinct().Select(x => hashes[x]).SelectMany(x => x).Select(x => Pathing.GetUNCPath(x)).Distinct().ToArray();
 
-                        if (files.Any(x => x != f))
+                        if (similarFiles.Any(x => x != f))
                         {
-                            OnCompareProgress(allfiles.Count(), f, files, 0);
+                            OnCompareProgress(filesCount, f, similarFiles, 0);
                         }
                         else
                         {
-                            OnCompareProgress(allfiles.Count(), null, null, 0);
+                            OnCompareProgress(filesCount, null, null, 0);
                         }
                     }
                     else

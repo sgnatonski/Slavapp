@@ -1,5 +1,7 @@
 ﻿using Caliburn.Micro;
 using SlavApp.ImageFinder;
+using SlavApp.ImageFinder.DHash;
+using SlavApp.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +13,9 @@ namespace SlavApp.Minion.ImageFinder.Actions
 {
     public class SimilarityRunAction : IResult
     {
-        private readonly PHashCalculator simFinder;
-        private readonly PHashComparer simComparer;
-        public SimilarityRunAction(PHashCalculator simFinder, PHashComparer simComparer)
+        private readonly DHashCalculator simFinder;
+        private readonly DHashComparer simComparer;
+        public SimilarityRunAction(DHashCalculator simFinder, DHashComparer simComparer)
         {
             this.simFinder = simFinder;
             this.simFinder.OnProgress += OnPrepProgress;
@@ -32,8 +34,11 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public async void Execute(CoroutineExecutionContext context)
         {
             this.CanRun = true;
-            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", () => this.CanRun));
-            await Task.Run(() => this.simComparer.Run(this.DirectoryName, "*.jpg", MaxDistance, () => this.CanRun));
+            var allfiles = System.IO.Directory.EnumerateFiles(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", System.IO.SearchOption.AllDirectories);
+            var filesCount = await Task.Run<int>(() => allfiles.Count());
+
+            await Task.Run(() => this.simFinder.Run(allfiles, filesCount, () => this.CanRun));
+            await Task.Run(() => this.simComparer.Run(allfiles, filesCount, MaxDistance, () => this.CanRun));
 
             Completed(this, new ResultCompletionEventArgs());
         }

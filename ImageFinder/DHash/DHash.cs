@@ -17,7 +17,7 @@ namespace SlavApp.ImageFinder.DHash
         public ulong Compute(string filename)
         {
             var bits = new Any64();
-            var scaled = this.Scale(Image.FromFile(filename), 9, 8);
+            var scaled = this.GetThumbnail(filename, 9, 8);
             var img = this.ToGrayscale(scaled);
             for(var y = 0; y < 8; y++)
             {
@@ -60,10 +60,13 @@ namespace SlavApp.ImageFinder.DHash
             return newBitmap;
         }
 
-        private Image Scale(Image imgPhoto, int width, int height)
+        private Image GetThumbnail(string filename, int width, int height)
         {
-            Image thumb = imgPhoto.GetThumbnailImage(width, height, () => false, IntPtr.Zero);
-            return thumb;
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            using (Image img = Image.FromStream(fs, true, false))
+            {
+                return (Bitmap)img.GetThumbnailImage(width, height, null, IntPtr.Zero);
+            }
         }
     }
 }
