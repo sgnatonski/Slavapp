@@ -194,6 +194,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.progressVM.UpdateProgress("[ 1 / 3 ] Starting analysis", 0, 1);
             this.sAction.DirectoryName = this.DirectoryName;
             this.sAction.MaxDistance = this.SimLevel;
+            this.sAction.Algorithm = settings["algorithm"];
 
             eventTimer.Start();
 

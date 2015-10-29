@@ -15,7 +15,7 @@ namespace SlavApp.ImageFinder.PHash
         [DllImport(@"pHash.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int ph_dct_imagehash(string file, ref ulong hash);
 
-        public delegate void ProgressEventHandler(long total);
+        public delegate void ProgressEventHandler();
 
         public event ProgressEventHandler OnProgress;
 
@@ -25,12 +25,12 @@ namespace SlavApp.ImageFinder.PHash
             Storage = DBreezeConfiguration.eStorage.DISK
         };
 
-        public void Run(IEnumerable<string> files, int filesCount)
+        public void Run(IEnumerable<string> files)
         {
-            this.Run(files, filesCount, () => true);
+            this.Run(files, () => true);
         }
 
-        public void Run(IEnumerable<string> files, int filesCount, Func<bool> continueTest)
+        public void Run(IEnumerable<string> files, Func<bool> continueTest)
         {
             using (var engine = new DBreezeEngine(dbConf))
             {
@@ -43,7 +43,7 @@ namespace SlavApp.ImageFinder.PHash
                             GetHash(tran, Pathing.GetUNCPath(f));
                             tran.Commit();
                         }
-                        OnProgress(filesCount);
+                        OnProgress();
                     }
                 });
             }
