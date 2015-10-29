@@ -22,6 +22,7 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         private readonly SimilarityRunAction sAction;
         private readonly IEventAggregator eventAggregator;
         private readonly Timer eventTimer = new Timer();
+        private readonly JsonSettings.Settings settings;
         public MainViewModel(IEventAggregator eventAggregator, SimilarityRunAction sAction)
         {
             this.eventAggregator = eventAggregator;
@@ -31,7 +32,9 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
             this.sAction.OnCompareProgress += OnRunProgress;
             this.sAction.Completed += a_Completed;
 
-            this.DirectoryName = @"R:\APART_ALL\ZDJĘCIA EXPO";
+            var path = Path.GetDirectoryName(Assembly.GetAssembly(typeof(MainViewModel)).Location);
+            this.settings = new JsonSettings.Settings(Path.Combine(path, "settings.json"));
+
             this.SimLevel = 3;
             eventTimer.Interval = 125;
             eventTimer.Elapsed += eventTimer_Elapsed;
@@ -44,19 +47,40 @@ namespace SlavApp.Minion.ImageFinder.ViewModels
         }
 
         private IProgressViewModel progressVM;
-            
-        private string directoryName;
+
         public string DirectoryName
         {
-            get { return directoryName; }
+            get { return settings["directory"]; }
             set
             {
-                this.directoryName = value;
+                settings.ChangeSetting("directory", value);
+                settings.Save();
                 NotifyOfPropertyChange(() => DirectoryName);
             }
         }
 
-        private int simLevel;
+        public bool UsePHash
+        {
+            get { return settings["algorithm"] == "pHash"; }
+            set
+            {
+                settings.ChangeSetting("algorithm", value ? "pHash" : "dHash");
+                settings.Save();
+                NotifyOfPropertyChange(() => UsePHash);
+                NotifyOfPropertyChange(() => UseDHash);
+            }
+        }
+
+        public bool UseDHash
+        {
+            get { return !this.UsePHash; }
+            set
+            {
+                this.UsePHash = !value;
+            }
+        }
+
+            private int simLevel;
         public int SimLevel
         {
             get { return simLevel; }

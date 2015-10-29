@@ -5,13 +5,14 @@
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:local="clr-namespace:SlavApp.Minion"
-    Width="850" MinHeight="600"
     BorderBrush="{DynamicResource AccentColorBrush}"
     BorderThickness="1"
+    SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <local:IconResourceConverter x:Key="IconResourceConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
         </ResourceDictionary>
     </Window.Resources>
     <Controls:MetroWindow.TitleTemplate>
@@ -19,7 +20,7 @@
     </Controls:MetroWindow.TitleTemplate>
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
-            <Button cal:Message.Attach="[Event Click] = [Action ShowMain()]">
+            <Button cal:Message.Attach="[Event Click] = [Action ShowMain()]" Visibility="{Binding IsPluginVisible, Converter={StaticResource BoolToVis}}">
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="24" Height="24">
                         <Rectangle.Fill>
@@ -40,7 +41,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Controls:Tile Title="{Binding Name}" Width="100" Height="100" TitleFontSize="14"
+                    <Controls:Tile Title="{Binding Name}" Width="100" Height="100" TitleFontSize="14" Margin="14"
                                    cal:Message.Attach="[Event Click] = [Action ShowPluginView($dataContext)]"
                                    cal:Action.TargetWithoutContext="{Binding DataContext, ElementName=grid}">
                         <Rectangle Width="100" Height="100">

@@ -24,6 +24,18 @@ namespace SlavApp.Minion.ViewModels
             this.DisplayName = "Minion";
         }
 
+        public bool IsPluginVisible
+        {
+            get
+            {
+                if (this.ActiveItem == null)
+                {
+                    return false;
+                }
+                return this.Plugins.Any(p => this.ActiveItem.DisplayName == p.EntryViewModelType.FullName);
+            }
+        }
+
         public List<IPlugin> Plugins
         {
             get
@@ -37,6 +49,7 @@ namespace SlavApp.Minion.ViewModels
             this.pluginManager.CloseAll();
             this.CloseItem(this.ActiveItem);
             this.DisplayName = "Minion";
+            NotifyOfPropertyChange(() => this.IsPluginVisible);
         }
 
         public void ShowPluginView(IPlugin plugin)
@@ -44,6 +57,7 @@ namespace SlavApp.Minion.ViewModels
             var vm = this.pluginManager.Create(plugin);
             this.ActivateItem(vm);
             this.DisplayName = "Minion - " + plugin.Name;
+            NotifyOfPropertyChange(() => this.IsPluginVisible);
         }
 
         public async Task ShowProgress()
@@ -71,7 +85,7 @@ namespace SlavApp.Minion.ViewModels
                     }
                 }
             }
-            return new Task(() => { });
+            return Task.FromResult(0);
         }
         public async Task CloseProgress()
         {

@@ -8,7 +8,7 @@
              xmlns:lc="clr-namespace:SlavApp.Minion.ImageFinder.Controls"
              xmlns:cal="http://www.caliburnproject.org"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="300" d:DesignWidth="600"
              Background="WhiteSmoke">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -36,6 +36,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -56,8 +57,13 @@
                     </Rectangle.Fill>
                 </Rectangle>
             </Button>
-            <Line Grid.Row="3" Grid.ColumnSpan="3" Margin="0 4 0 0" Stroke="Black" Stretch="Fill" StrokeThickness="1" X1="0" X2="1"></Line>
-            <ListBox x:Name="List" Margin="2" Grid.Row="4" Grid.ColumnSpan="3">
+            <Label Grid.Row="3" Content="Algorithm"></Label>
+            <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <RadioButton IsChecked="{Binding Path=UsePHash}" Margin="15 0">pHash</RadioButton>
+                <RadioButton IsChecked="{Binding Path=UseDHash}" Margin="15 0">dHash</RadioButton>
+            </StackPanel>
+            <Line Grid.Row="4" Grid.ColumnSpan="3" Margin="0 4 0 0" Stroke="Black" Stretch="Fill" StrokeThickness="1" X1="0" X2="1"></Line>
+            <ListBox x:Name="List" Margin="2" Grid.Row="5" Grid.ColumnSpan="3">
                 <ListBox.Template>
                     <ControlTemplate>
                         <lc:ViewportAwareScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
