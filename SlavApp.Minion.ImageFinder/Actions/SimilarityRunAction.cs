@@ -1,5 +1,7 @@
 ﻿using Caliburn.Micro;
 using SlavApp.ImageFinder;
+using SlavApp.ImageFinder.DHash;
+using SlavApp.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +13,9 @@ namespace SlavApp.Minion.ImageFinder.Actions
 {
     public class SimilarityRunAction : IResult
     {
-        private readonly PHashCalculator simFinder;
-        private readonly PHashComparer simComparer;
-        public SimilarityRunAction(PHashCalculator simFinder, PHashComparer simComparer)
+        private readonly DHashCalculator simFinder;
+        private readonly DHashComparer simComparer;
+        public SimilarityRunAction(DHashCalculator simFinder, DHashComparer simComparer)
         {
             this.simFinder = simFinder;
             this.simFinder.OnProgress += OnPrepProgress;
@@ -29,23 +31,48 @@ namespace SlavApp.Minion.ImageFinder.Actions
         public event EventHandler<SimilarityRunEventArgs> OnCompareProgress = delegate { };
         public event EventHandler<PrepareEventArgs> OnPrepareProgress = delegate { };
 
+        private int total;
+
         public async void Execute(CoroutineExecutionContext context)
         {
             this.CanRun = true;
-            await Task.Run(() => this.simFinder.Run(this.DirectoryName, "*.jpg", () => this.CanRun));
-            await Task.Run(() => this.simComparer.Run(this.DirectoryName, "*.jpg", MaxDistance, () => this.CanRun));
+            var allfiles = System.IO.Directory.EnumerateFiles(Pathing.GetUNCPath(this.DirectoryName), "*.jpg", System.IO.SearchOption.AllDirectories);
+            this.total = await Task.Run<int>(() => allfiles.Count());
+
+            await Task.Run(() => this.simFinder.Run(allfiles, () => this.CanRun));
+            await Task.Run(() => this.simComparer.Run(allfiles, MaxDistance, () => this.CanRun));
 
             Completed(this, new ResultCompletionEventArgs());
         }
 
-        private void OnPrepProgress(long total)
+        private void OnPrepProgress()
         {
-            OnPrepareProgress(this, new PrepareEventArgs(total));
+            OnPrepareProgress(this, new PrepareEventArgs(this.total));
         }
 
-        private void OnRunProgress(long total, string file1, string[] file2, double value)
+        private void OnRunProgress(Distance[] files)
         {
-            OnCompareProgress(this, new SimilarityRunEventArgs(total, file1, file2, value));
+            OnCompareProgress(this, new SimilarityRunEventArgs(this.total, files));
         }
+    }
+
+    public class SimilarityRunEventArgs :EventArgs
+    {
+        public SimilarityRunEventArgs(long total, Distance[] files)
+        {
+            Total = total;
+            Files = files;
+        }
+        public long Total { get; private set; }
+        public Distance[] Files { get; private set; }
+    }
+
+    public class PrepareEventArgs : EventArgs
+    {
+        public PrepareEventArgs(long total)
+        {
+            Total = total;
+        }
+        public long Total { get; private set; }
     }
 }

@@ -16,7 +16,7 @@ namespace SlavApp.Minion.ImageFinder
     public class SimilarityModel : Caliburn.Micro.PropertyChangedBase
     {
         private string name;
-        private double value;
+        private int value;
         private ObservableCollection<ExifData> exif;
         private bool exifLoaded;
         public string Name
@@ -38,7 +38,7 @@ namespace SlavApp.Minion.ImageFinder
         {
             get { return Path.GetFileNameWithoutExtension(this.name); }
         }
-        public double Value
+        public int Value
         {
             get { return value; }
             set
@@ -73,6 +73,7 @@ namespace SlavApp.Minion.ImageFinder
         private void UpdateExif()
         {
             var e = new List<ExifData>();
+            e.Add(new ExifData() { Key = "Distance", Value = this.Value.ToString() });
             try
             {
                 using (var reader = new ExifReader(Name))

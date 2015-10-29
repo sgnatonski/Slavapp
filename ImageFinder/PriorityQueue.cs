@@ -62,10 +62,10 @@ namespace SlavApp.ImageFinder
 
         public IEnumerable<PItem> List()
         {
-            return contents.Select(item => { return new PItem { i = item.data, d = item.priority }; });
+            return contents.Select(item => new PItem { i = item.data, d = item.priority });
         }
 
-        public class PItemInternal
+        private class PItemInternal
         {
             public int data { get; set; }
 
