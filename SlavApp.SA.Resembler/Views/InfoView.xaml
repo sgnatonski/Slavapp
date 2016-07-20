@@ -1,0 +1,64 @@
+﻿<Controls:MetroWindow
+    x:Class="SlavApp.SA.Resembler.Views.InfoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:cal="http://www.caliburnproject.org"
+    xmlns:local="clr-namespace:SlavApp.Minion"
+    BorderBrush="{DynamicResource AccentColorBrush}"
+    BorderThickness="1"
+    Width="450"
+    SizeToContent="Height"
+    IsMaxRestoreButtonEnabled="False"
+    IsMinButtonEnabled="False"
+    IsCloseButtonEnabled="False"
+    WindowStartupLocation="CenterScreen"
+     ShowCloseButton="False"
+            ShowMaxRestoreButton="False"
+            ShowMinButton="False"
+    ShowInTaskbar="False">
+    <Controls:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+                <Image Source="..\Resources\icon_032.ico" Margin="2 2 0 0"/>
+                <TextBlock Text="sembler" Margin="0 4 0 0" Foreground="Black" FontSize="14"/>
+            </StackPanel>
+        </DataTemplate>
+    </Controls:MetroWindow.IconTemplate>
+    <Controls:MetroWindow.TitleTemplate>
+        <DataTemplate></DataTemplate>
+    </Controls:MetroWindow.TitleTemplate>
+    <Grid x:Name="grid" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="WrapWithOverflow" FontSize="12" Grid.Row="0">
+            <Run FontSize="14" FontWeight="Bold">Thank you for using Resembler!</Run><LineBreak />
+            <LineBreak />            
+            If you find this application useful (as I do, it's why I'm releasing it to you :) ) please do not hesitate and make a donation, any amount will be really helpful to make this project development running - it was, and is created in my spare time.<LineBreak />
+            <LineBreak />
+            If you want to buy me a cup of good coffee or just to show your support for the project check the link below and use the Donate button. <LineBreak />
+            <LineBreak />            
+            Thank you in advance!
+        </TextBlock>
+        <Button Content="Donate" Grid.Row="2" Cursor="Hand" HorizontalContentAlignment="Center" HorizontalAlignment="Center">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <TextBlock TextDecorations="Underline" FontSize="18">
+                        <Hyperlink NavigateUri="http://sgnatonski.github.io/donate.html" RequestNavigate="Hyperlink_RequestNavigate">Donate the project</Hyperlink>
+                    </TextBlock>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <TextBlock TextWrapping="WrapWithOverflow" FontSize="11" Grid.Row="4">
+            The pHash algorithm was developed by <Hyperlink NavigateUri="http://phash.org" RequestNavigate="Hyperlink_RequestNavigate">phash.org</Hyperlink>.<LineBreak />
+            Everything else was happily coded by <Hyperlink NavigateUri="http://sgnatonski.github.io/" RequestNavigate="Hyperlink_RequestNavigate">Sławek Gnatoński</Hyperlink>.<LineBreak />
+        </TextBlock>
+        <Button Name="Close" Content="Close" Grid.Row="5"/>
+    </Grid>
+</Controls:MetroWindow>

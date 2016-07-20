@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="SlavApp.Minion.Resembler.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:local="clr-namespace:SlavApp.Minion.Resembler"
+             xmlns:lc="clr-namespace:SlavApp.Minion.Resembler.Controls"
+             xmlns:cal="http://www.caliburnproject.org"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             Background="WhiteSmoke">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/SlavApp.Minion.Resembler;component/Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="Algorithm"></Label>
+            <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <RadioButton IsChecked="{Binding Path=UsePHash}" Margin="15 0">pHash</RadioButton>
+                <RadioButton IsChecked="{Binding Path=UseDHash}" Margin="15 0">dHash</RadioButton>
+            </StackPanel>
+            <Label Grid.Row="1" Content="Context menu"></Label>
+            <Button Grid.Row="1" Grid.Column="1" x:Name="InstallContext" Content="{Binding InstallContextLabel}" Margin="0 2 2 2" HorizontalAlignment="Stretch"></Button>
+            <Label Grid.Row="2" Content="Drives to scan"></Label>
+            <ItemsControl ItemsSource="{Binding Path=DrivesToScan}" Grid.Row="2" Grid.Column="1">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Drive}" IsChecked="{Binding IsSelected}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>    
+</UserControl>

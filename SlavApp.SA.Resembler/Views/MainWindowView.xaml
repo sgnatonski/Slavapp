@@ -1,0 +1,67 @@
+﻿<Controls:MetroWindow
+    x:Class="SlavApp.Minion.Views.MainWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:cal="http://www.caliburnproject.org"
+    xmlns:local="clr-namespace:SlavApp.Minion"
+    BorderBrush="{DynamicResource AccentColorBrush}"
+    BorderThickness="1"
+    SizeToContent="Height"
+    MinWidth="400" MinHeight="300"
+    TitleCaps="False"
+    WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <Controls:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+                <Image Source="..\Resources\icon_032.ico" Margin="2 2 0 0"/>
+                <TextBlock Text="sembler" Margin="0 4 0 0" Foreground="Black" FontSize="14"/>
+            </StackPanel>
+        </DataTemplate>
+    </Controls:MetroWindow.IconTemplate>
+    <Controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+        </DataTemplate>
+    </Controls:MetroWindow.TitleTemplate>
+    <Controls:MetroWindow.LeftWindowCommands>
+        <Controls:WindowCommands>
+            <Button cal:Message.Attach="[Event Click] = [Action ShowMain()]" Visibility="{Binding IsSettingVisible, Converter={StaticResource BoolToVis}}">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="24" Height="24">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_home}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock Text="Home" VerticalAlignment="Center" Padding="6 0 0 0" />
+                </StackPanel>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.LeftWindowCommands>
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button cal:Message.Attach="[Event Click] = [Action ShowPluginSettings()]" Visibility="{Binding IsMainVisible, Converter={StaticResource BoolToVis}}">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="24" Height="24">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_cog}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    <Grid x:Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ContentControl x:Name="StatusItem" Grid.Row="0" />
+        <ContentControl x:Name="ActiveItem" Grid.Row="1" />
+    </Grid>
+
+</Controls:MetroWindow>

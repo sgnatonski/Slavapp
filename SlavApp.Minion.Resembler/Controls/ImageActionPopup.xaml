@@ -1,0 +1,44 @@
+﻿<Popup x:Class="SlavApp.Minion.Resembler.Controls.ImageActionPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+    <Popup.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="../Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Popup.Resources>
+    <StackPanel Background="White">
+        <StackPanel.Effect>
+            <DropShadowEffect BlurRadius="8" ShadowDepth="5"/>
+        </StackPanel.Effect>
+        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}" Click="Open_Click">
+            <StackPanel>
+                <Rectangle Width="32" Height="32">
+                    <Rectangle.Fill>
+                        <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_eye}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+                <TextBlock Text="Open file"/>
+            </StackPanel>
+        </Button>
+        <Button Margin="2" Style="{StaticResource AccentedSquareButtonStyle}" Click="Delete_Click">
+            <StackPanel>
+                <Rectangle Width="32" Height="32">
+                    <Rectangle.Fill>
+                        <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_delete}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+                <TextBlock Text="Delete file"/>
+            </StackPanel>
+        </Button>
+    </StackPanel>
+</Popup>

@@ -1,0 +1,52 @@
+﻿<Controls:MetroWindow x:Class="SlavApp.Minion.Resembler.Views.StartScanView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SlavApp.Minion.Resembler.Views"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d"
+            BorderBrush="{DynamicResource AccentColorBrush}"
+            BorderThickness="1"
+            ShowCloseButton="False"
+            ShowMaxRestoreButton="False"
+            ShowMinButton="False"
+            ShowTitleBar="False"
+            ShowInTaskbar="False"
+            WindowStartupLocation="CenterScreen"
+            SizeToContent="WidthAndHeight"
+            MinWidth="340"
+            ResizeMode="NoResize"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <StackPanel Margin="10">
+            <Grid Margin="0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="pack://application:,,,/SlavApp.SA.Resembler;component/Resources/icon_128.ico" Width="64" Height="64" HorizontalAlignment="Left" Margin="-4 0 0 0"/>
+                <TextBlock Grid.Column="1" FontStyle="Italic">"Mirror, mirror on the wall, find similar in them all."</TextBlock>
+                <TextBlock Grid.ColumnSpan="2" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Bottom">Welcome to Resembler!</TextBlock>
+            </Grid>
+            <TextBlock TextWrapping="Wrap"  MaxWidth="600">
+                <Run>Image comparing it a time consuming operation, the calculation is estimated to take 2 seconds per image on average, so Resembler can try to run those calculation upfront in order to make future actions almost instant.</Run>
+                <LineBreak></LineBreak>
+                <Run>You will be asked what locations Resembler is allowed to scan for pictures.</Run>
+                <LineBreak></LineBreak>
+                <Run>Scan will be running in the background, so you can continue your work as usual, you can also pause the scan at any moment.</Run>
+                <LineBreak></LineBreak>
+                <LineBreak></LineBreak>
+                <Run>Do you want to run the scan now?</Run>
+            </TextBlock>
+            <Grid Margin="0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Name="RunScan" Content="Run scan" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                <Button Grid.Column="1" Name="SkipScan" Content="Skip" Style="{StaticResource AccentedSquareButtonStyle}"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Controls:MetroWindow>
