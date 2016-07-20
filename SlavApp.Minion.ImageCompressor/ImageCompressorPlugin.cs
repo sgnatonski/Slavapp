@@ -20,9 +20,22 @@ namespace SlavApp.Minion.ImageCompressor
             get { return typeof(MainViewModel); }
         }
 
+        public Type SettingsViewModelType
+        {
+            get { return null; }
+        }
+
         public string IconName
         {
             get { return "appbar.resource.group"; }
+        }
+
+        public void Startup()
+        {
+        }
+
+        public void Cleanup()
+        {
         }
     }
 }
