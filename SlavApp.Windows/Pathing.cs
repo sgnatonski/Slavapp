@@ -43,12 +43,12 @@ namespace SlavApp.Windows
                         DirectoryInfo dir = new DirectoryInfo(originalPath);
 
                         string path = Path.GetFullPath(originalPath).Substring(Path.GetPathRoot(originalPath).Length);
-                        return Path.Combine(sb.ToString().TrimEnd(), path);
+                        return Path.Combine(sb.ToString().TrimEnd(), path).ToLower();
                     }
                 }
             }
 
-            return originalPath;
+            return originalPath.ToLower();
         }
     }
 }
