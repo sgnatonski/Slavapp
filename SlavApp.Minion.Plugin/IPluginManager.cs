@@ -6,7 +6,8 @@ namespace SlavApp.Minion.Plugin
     public interface IPluginManager
     {
         IEnumerable<IPlugin> List();
-        IScreen Create(IPlugin plugin);
+        IScreen CreateEntryViewModel(IPlugin plugin);
+        IScreen CreateSettingsViewModel(IPlugin plugin);
         void CloseAll();
     }
 }

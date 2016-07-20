@@ -13,5 +13,10 @@ namespace SlavApp.Minion.Plugin
         string Name { get; }
         string IconName { get; }
         Type EntryViewModelType { get; }
+        Type SettingsViewModelType { get; }
+
+        void Startup();
+
+        void Cleanup();
     }
 }

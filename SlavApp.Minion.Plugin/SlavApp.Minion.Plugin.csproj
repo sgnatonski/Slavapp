@@ -29,6 +29,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Caliburn.Micro, Version=2.0.2.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
       <HintPath>..\packages\Caliburn.Micro.Core.3.0.0-beta1\lib\net45\Caliburn.Micro.dll</HintPath>
@@ -60,6 +67,7 @@
     <Compile Include="IProgressViewModel.cs" />
     <Compile Include="ObservableConcurrentDictionary.cs" />
     <Compile Include="CancelProgressMessage.cs" />
+    <Compile Include="OpenPluginMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
