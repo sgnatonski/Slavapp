@@ -32,6 +32,19 @@
             </Button>
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <Button cal:Message.Attach="[Event Click] = [Action ShowPluginSettings()]" Visibility="{Binding IsPluginVisible, Converter={StaticResource BoolToVis}}">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="24" Height="24">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_cog}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </StackPanel>
+            </Button>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
     <Grid x:Name="grid">
         <ItemsControl x:Name="Plugins">
             <ItemsControl.ItemsPanel>
