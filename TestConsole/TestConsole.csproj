@@ -48,10 +48,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImageFinder\SlavApp.ImageFinder.csproj">
-      <Project>{fdaafec9-d7d2-4bac-a119-cf50c66737cf}</Project>
-      <Name>SlavApp.ImageFinder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LinqSpecifications\LinqSpecifications.csproj">
       <Project>{720818de-7fc2-4132-a3bf-8ed939999eb6}</Project>
       <Name>LinqSpecifications</Name>
@@ -63,6 +59,18 @@
     <ProjectReference Include="..\Notifications\Notifications.csproj">
       <Project>{0f00b525-eb3d-48ce-9383-148b6803c212}</Project>
       <Name>Notifications</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SlavApp.Minion.ImageFinder.Context\SlavApp.Minion.Resembler.Context.csproj">
+      <Project>{c366e4ec-61f4-4b88-b13b-9020648830af}</Project>
+      <Name>SlavApp.Minion.Resembler.Context</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SlavApp.Resembler\SlavApp.Resembler.csproj">
+      <Project>{fdaafec9-d7d2-4bac-a119-cf50c66737cf}</Project>
+      <Name>SlavApp.Resembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SlavApp.Windows\SlavApp.Windows.csproj">
+      <Project>{e878f450-178e-46db-82ff-8338652c1e0a}</Project>
+      <Name>SlavApp.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\WinProcessWatcher\WinProcessWatcher.csproj">
       <Project>{6d3cd09f-5855-42cb-b1dd-9ad5efd414d8}</Project>
