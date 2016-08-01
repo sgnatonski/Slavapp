@@ -29,6 +29,7 @@ namespace TorrentBrowser
 
                 var movies = pages.AsParallel().Select(async p =>
                 {
+                    var quality = TorrentQualityExtractor.ExtractQuality(p.Title);
                     var page = await PirateRequest.OpenAsync(p.TorrentUri, cancellationToken);
                     var imdbUri = TorrentImdbLinkExtractor.ExtractImdbLink(page);
                     var imdbId = TorrentImdbLinkExtractor.ExtractImdbId(imdbUri);
@@ -39,18 +40,20 @@ namespace TorrentBrowser
                         {
                             TorrentLink = p.TorrentUri,
                             Movie = p.TorrentPage.Split('/').LastOrDefault(),
-                            Quality = TorrentQualityExtractor.ExtractQuality(p.Title)
+                            Quality = quality
                         };
                     }
                     
                     var cacheMovie = _repository.Get(imdbUri);
                     if (cacheMovie != null)
                     {
+                        Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
                         return cacheMovie;
                     }
                     
                     var imdbData = await ImdbDataExtractor.ExtractData(imdbUri, cancellationToken);
-                    
+                    var subtitles = await OpenSubtitles.GetSubtitles(imdbId, "pol");
+
                     var movie = new TorrentMovie
                     {
                         Id = imdbData.Id,
@@ -59,8 +62,8 @@ namespace TorrentBrowser
                         PictureUrl = imdbData.PictureLink,
                         Movie = (imdbData.MovieName ?? p.Title).Trim(),
                         Rating = imdbData.Rating.GetValueOrDefault(),
-                        Quality = TorrentQualityExtractor.ExtractQuality(p.Title),
-                        Subtitles = OpenSubtitles.GetSubtitles(imdbData.Id, "pol"),
+                        Quality = quality,
+                        Subtitles = subtitles,
                         LastUpdated = DateTime.Now
                     };
 
