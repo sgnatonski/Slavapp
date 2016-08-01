@@ -41,28 +41,11 @@ namespace PirateCinema
 
                 var worker = new TorrentBrowserWorker();
 
-                var moviesSource1 = worker.Work(new TorrentSite
-                {
-                    ListUrl = "https://thepiratebay.org/top/201",
-                    PageBaseUrl = "https://thepiratebay.org/",
-                    ListItemSelector = "#searchResult > tbody > tr > td > div > a"
-                }, cancelToken.Token);
+                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, cancelToken.Token);
+                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, cancelToken.Token);
+                //var moviesSource3 = worker.Work(TorrentSiteProvider.Kat, cancelToken.Token);
 
-                //var movies = new TorrentBrowserWorker().Work(new TorrentSite
-                //{
-                //    ListUrl = "https://kat.cr/movies/?field=seeders&sorder=desc",
-                //    PageBaseUrl = "https://kat.cr/",
-                //    ListItemSelector = "table > tbody > tr > td > div.torrentname > div > a"
-                //}, cancellationToken);
-
-                var moviesSource3 = worker.Work(new TorrentSite
-                {
-                    ListUrl = "http://extratorrent.cc/category/49/Thriller+Torrents.html",
-                    PageBaseUrl = "http://extratorrent.cc",
-                    ListItemSelector = "table.tl > tbody > tr > td.tli > a"
-                }, cancelToken.Token);
-
-                var moviesMerged = moviesSource1.Merge(moviesSource3);
+                var moviesMerged = moviesSource1.Merge(moviesSource2);
 
                 moviesMerged.Subscribe(tm =>
                 {

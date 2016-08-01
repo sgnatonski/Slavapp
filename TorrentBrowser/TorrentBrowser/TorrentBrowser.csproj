@@ -89,6 +89,7 @@
     <Compile Include="TorrentMovie.cs" />
     <Compile Include="TorrentMovieRepository.cs" />
     <Compile Include="TorrentSite.cs" />
+    <Compile Include="TorrentSiteProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
