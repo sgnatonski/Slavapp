@@ -34,10 +34,10 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="50"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="42"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{Binding Movie}" Grid.ColumnSpan="5" Margin="4" />
                                 <TextBlock Text="{Binding Rating}" Grid.Row="1" Grid.Column="0" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -60,10 +60,9 @@
                                         </Image>
                                     </Hyperlink>
                                 </TextBlock>
-                                <TextBlock Grid.Row="1" Grid.Column="5" Visibility="{Binding HasSubtitles, Converter={StaticResource bool2VisibilityConverter}}">
-                                    pl
+                                <TextBlock Grid.Row="1" Grid.Column="5" Visibility="{Binding HasSubtitles, Converter={StaticResource bool2VisibilityConverter}}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" Text="pl">
                                 </TextBlock>
-
                             </Grid>
                         </Button>
                     </DataTemplate>
