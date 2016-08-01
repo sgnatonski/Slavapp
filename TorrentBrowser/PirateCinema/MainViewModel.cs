@@ -48,13 +48,7 @@ namespace PirateCinema
 
                 var moviesMerged = moviesSource1.Merge(moviesSource2);
 
-                moviesMerged.Subscribe(tm =>
-                {
-                    if (Application.Current != null)
-                    {
-                        Application.Current.Dispatcher.Invoke(() => movieList.List.Add(tm));
-                    }                  
-                });
+                moviesMerged.Subscribe(tm => Application.Current.Dispatcher.Invoke(() => movieList.List.Add(tm)), _cancelToken.Token);
             });
         }
 
