@@ -8,7 +8,7 @@ namespace TorrentBrowser
 {
     public static class OpenSubtitles
     {
-        public static async Task<string[]> GetSubtitles(int imdbid, string langid)
+        public static async Task<string[]> GetSubtitles(int imdbid, SubtitleLanguage langid)
         {
             return await Task.Run(() =>
             {

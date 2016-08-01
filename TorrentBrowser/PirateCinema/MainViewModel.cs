@@ -41,9 +41,9 @@ namespace PirateCinema
 
                 var worker = new TorrentBrowserWorker();
 
-                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, cancelToken.Token);
-                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, cancelToken.Token);
-                //var moviesSource3 = worker.Work(TorrentSiteProvider.Kat, cancelToken.Token);
+                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, SubtitleLanguage.Polish, cancelToken.Token);
+                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, SubtitleLanguage.Polish, cancelToken.Token);
+                //var moviesSource3 = worker.Work(TorrentSiteProvider.Kat, SubtitleLanguage.Polish, cancelToken.Token);
 
                 var moviesMerged = moviesSource1.Merge(moviesSource2);
 

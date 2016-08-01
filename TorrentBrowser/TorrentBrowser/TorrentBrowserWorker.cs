@@ -21,7 +21,7 @@ namespace TorrentBrowser
             return _repository.GetAll();
         }
 
-        public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
+        public IObservable<TorrentMovie> Work(TorrentSite site, SubtitleLanguage subtitleLang, CancellationToken cancellationToken)
         {
             return Observable.Create<TorrentMovie>(observer =>
             {
@@ -44,7 +44,7 @@ namespace TorrentBrowser
                     }
                     
                     var imdbData = await ImdbDataExtractor.ExtractData(imdbEntry.ImdbLink, cancellationToken);
-                    var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, "pol");
+                    var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, subtitleLang);
 
                     var movie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry, imdbData, subtitles);
 
