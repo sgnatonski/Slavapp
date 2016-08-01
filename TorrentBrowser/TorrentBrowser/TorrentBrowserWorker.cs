@@ -1,7 +1,5 @@
 ﻿using AngleSharp;
 using AngleSharp.Network;
-using AngleSharp.Parser.Html;
-using AngleSharp.Scripting;
 using LiteDB;
 using System;
 using System.Collections.Concurrent;
@@ -9,10 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -72,7 +67,7 @@ namespace TorrentBrowser
                     var page = await browsingContext.OpenAsync(CreateRequest(torrentLink), cancellationToken);
                     var links = page.QuerySelectorAll("a");
                     var tmp = links.Select(x => x.GetAttribute("href")?.Trim('\r', '\n')).ToList();
-                    var imdbLink = tmp.Where(x => x != null && x.StartsWith("http://www.imdb.com/title/")).FirstOrDefault();
+                    var imdbLink = tmp.FirstOrDefault(x => x != null && x.StartsWith("http://www.imdb.com/title/"));
 
                     if (imdbLink == null)
                     {
@@ -149,7 +144,7 @@ namespace TorrentBrowser
 
                 movies.Select(t => Observable.FromAsync(() => t))
                       .Merge()
-                      .Do(s => observer.OnNext(s), () => observer.OnCompleted())
+                      .Do(observer.OnNext, observer.OnCompleted)
                       .Wait();
 
                 return Disposable.Create(() => Console.WriteLine("Observer has unsubscribed"));
