@@ -11,8 +11,10 @@ namespace TorrentBrowser
             var imdbPage = await PirateRequest.OpenAsync(uri, cancellationToken);
             var imdbQueries = new ImdbQueryProvider();
 
-            var movieName = imdbPage.QuerySelector(imdbQueries.OriginalTitleQuery)?.TextContent.Replace("(original title)", "")
-                         ?? imdbPage.QuerySelector(imdbQueries.TitleQuery)?.TextContent;
+            var originalTitle = imdbPage.QuerySelector(imdbQueries.OriginalTitleQuery)?.TextContent.Replace("(original title)", "");
+            var movieName = originalTitle != null 
+                ? $"{originalTitle} ({imdbPage.QuerySelector(imdbQueries.YearQuery)?.TextContent})"
+                : imdbPage.QuerySelector(imdbQueries.TitleQuery)?.TextContent;
             var rating = imdbPage.QuerySelector(imdbQueries.RatingQuery)?.TextContent;
             var pictureUrl = imdbPage.QuerySelector(imdbQueries.PictureQuery)?.GetAttribute("src");
 
