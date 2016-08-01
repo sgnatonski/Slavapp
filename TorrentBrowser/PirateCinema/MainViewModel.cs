@@ -13,7 +13,7 @@ namespace PirateCinema
     {
         public MainViewModel()
         {
-            FetchCommand = ReactiveCommand.CreateAsyncObservable(x => FetchMovies());
+            FetchCommand = ReactiveCommand.CreateAsyncObservable(_ => FetchMovies());
 
             var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
 
@@ -22,42 +22,45 @@ namespace PirateCinema
 
         public ICommand FetchCommand { get; set; }
 
-        private IReadOnlyReactiveList<TorrentMovie> moviesList;
+        private IReadOnlyReactiveList<TorrentMovie> _moviesList;
         public IReadOnlyReactiveList<TorrentMovie> MoviesList
         {
-            get { return moviesList; }
-            set { this.RaiseAndSetIfChanged(ref moviesList, value); }
+            get { return _moviesList; }
+            set { this.RaiseAndSetIfChanged(ref _moviesList, value); }
         }
 
         public IObservable<Unit> FetchMovies()
         {
             var movieList = MovieListFactory.Build();
+
             MoviesList = movieList.ByRatingWithSubtitle;
 
             return Observable.Start(() =>
             {
-                var moviesSource1 = new TorrentBrowserWorker().Work(new TorrentSite
+                var cancelToken = new CancellationTokenSource();
+
+                var worker = new TorrentBrowserWorker();
+
+                var moviesSource1 = worker.Work(new TorrentSite
                 {
                     ListUrl = "https://thepiratebay.org/top/201",
                     PageBaseUrl = "https://thepiratebay.org/",
                     ListItemSelector = "#searchResult > tbody > tr > td > div > a"
-                }, new CancellationToken());
+                }, cancelToken.Token);
 
                 //var movies = new TorrentBrowserWorker().Work(new TorrentSite
                 //{
                 //    ListUrl = "https://kat.cr/movies/?field=seeders&sorder=desc",
                 //    PageBaseUrl = "https://kat.cr/",
                 //    ListItemSelector = "table > tbody > tr > td > div.torrentname > div > a"
-                //}, new CancellationToken());
+                //}, cancellationToken);
 
-                var moviesSource3 = new TorrentBrowserWorker().Work(new TorrentSite
+                var moviesSource3 = worker.Work(new TorrentSite
                 {
                     ListUrl = "http://extratorrent.cc/category/49/Thriller+Torrents.html",
                     PageBaseUrl = "http://extratorrent.cc",
                     ListItemSelector = "table.tl > tbody > tr > td.tli > a"
-                }, new CancellationToken());
-
-                //var movies = new FakeTorrentBrowserWorker().Work();
+                }, cancelToken.Token);
 
                 var moviesMerged = moviesSource1.Merge(moviesSource3);
 

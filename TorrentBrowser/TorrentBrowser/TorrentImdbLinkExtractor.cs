@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
 
 namespace TorrentBrowser
@@ -21,6 +18,19 @@ namespace TorrentBrowser
             }
 
             return new Uri(imdbLink.Replace("reference", "").TrimEnd('/') + "/");
+        }
+
+        public static int ExtractImdbId(Uri uri)
+        {
+            var id = 0;
+            if (uri == null)
+            {
+                return id;
+            }
+
+            int.TryParse(uri.Segments[2].Substring(2).TrimEnd('/'), out id);
+
+            return id;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace TorrentBrowser
 {
-    public static class QualityExtractor
+    public static class TorrentQualityExtractor
     {
         public static string ExtractQuality(string moviename)
         {

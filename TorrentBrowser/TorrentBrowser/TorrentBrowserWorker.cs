@@ -9,16 +9,16 @@ namespace TorrentBrowser
 {
     public class TorrentBrowserWorker
     {
-        private readonly TorrentMovieCache _cache;
+        private readonly TorrentMovieRepository _repository;
 
         public TorrentBrowserWorker()
         {
-            _cache = new TorrentMovieCache();
+            _repository = new TorrentMovieRepository();
         }
         
         public IEnumerable<TorrentMovie> GetCache()
         {
-            return _cache.GetAll();
+            return _repository.GetAll();
         }
 
         public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
@@ -31,8 +31,9 @@ namespace TorrentBrowser
                 {
                     var page = await PirateRequest.OpenAsync(p.TorrentUri, cancellationToken);
                     var imdbUri = TorrentImdbLinkExtractor.ExtractImdbLink(page);
+                    var imdbId = TorrentImdbLinkExtractor.ExtractImdbId(imdbUri);
 
-                    if (imdbUri == null)
+                    if (imdbUri == null || imdbId == 0)
                     {
                         return new TorrentMovie
                         {
@@ -41,8 +42,8 @@ namespace TorrentBrowser
                             Quality = TorrentQualityExtractor.ExtractQuality(p.Title)
                         };
                     }
-
-                    var cacheMovie = _cache.Get(imdbUri);
+                    
+                    var cacheMovie = _repository.Get(imdbUri);
                     if (cacheMovie != null)
                     {
                         return cacheMovie;
@@ -63,12 +64,7 @@ namespace TorrentBrowser
                         LastUpdated = DateTime.Now
                     };
 
-                    if (imdbData.Id == 0)
-                    {
-                        return movie;
-                    }
-
-                    _cache.Add(imdbUri, movie);
+                    _repository.Add(imdbUri, movie);
 
                     return movie;
                 });
