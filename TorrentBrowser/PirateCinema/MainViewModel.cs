@@ -9,7 +9,7 @@ using TorrentBrowser;
 
 namespace PirateCinema
 {
-    public class MainViewModel : ReactiveObject
+    public class MainViewModel : ReactiveObject, IDisposable
     {
         private readonly CancellationTokenSource _cancelToken = new CancellationTokenSource();
 
@@ -61,7 +61,22 @@ namespace PirateCinema
 
         private void Current_Exit(object sender, ExitEventArgs e)
         {
-            _cancelToken.Cancel();
+            _cancelToken?.Cancel();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool dispose)
+        {
+            if (dispose)
+            {
+                _cancelToken.Dispose();
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }
