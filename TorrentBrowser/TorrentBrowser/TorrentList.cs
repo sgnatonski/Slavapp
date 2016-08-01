@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace TorrentBrowser
 {
@@ -10,19 +10,18 @@ namespace TorrentBrowser
     {
         private static readonly string[] Filter = {"dvdscr", "camrip", "hdcam", ".tc.", "hdtc", "hdts", "hd-ts"};
 
-        public static IEnumerable<TorrentEntry> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
+        public static async Task<IEnumerable<TorrentEntry>> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
         {
-            var pob = Observable.FromAsync(() => PirateRequest.OpenAsync(new Uri(site.ListUrl), cancellationToken));
-            var document = pob.Wait();
-            var cells = document.QuerySelectorAll(site.ListItemSelector).ToList();
-
-            var entries = cells.Select(m => new TorrentEntry
-            {
-                Title = m.TextContent,
-                Quality = TorrentQualityExtractor.ExtractQuality(m.TextContent),
-                TorrentPage = site.PageBaseUrl + m.GetAttribute("href")?.Trim(),
-                TorrentUri = new Uri(site.PageBaseUrl + m.GetAttribute("href")?.Trim())
-            });
+            var document = await PirateRequest.OpenAsync(new Uri(site.ListUrl), cancellationToken);
+            var entries = document.QuerySelectorAll(site.ListItemSelector)
+                .Select(c => new { Text = c.TextContent, Href = c.GetAttribute("href")?.Trim() })
+                .Select(m => new TorrentEntry
+                {
+                    Title = m.Text,
+                    Quality = TorrentQualityExtractor.ExtractQuality(m.Text),
+                    TorrentPage = site.PageBaseUrl + m.Href,
+                    TorrentUri = new Uri(site.PageBaseUrl + m.Href)
+                });
 
             return FilterMovies(entries);
         }

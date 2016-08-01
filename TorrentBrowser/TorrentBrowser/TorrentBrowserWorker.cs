@@ -25,7 +25,8 @@ namespace TorrentBrowser
         {
             return Observable.Create<TorrentMovie>(observer =>
             {
-                var torrents = TorrentList.GetTorrents(site, cancellationToken);
+                var torrentsObs = Observable.FromAsync(() => TorrentList.GetTorrents(site, cancellationToken));
+                var torrents = torrentsObs.Wait();
 
                 var movies = torrents.AsParallel().Select(async torrent =>
                 {
