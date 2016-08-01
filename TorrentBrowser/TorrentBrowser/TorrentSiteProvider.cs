@@ -17,16 +17,16 @@ namespace TorrentBrowser
 
         public static TorrentSite ExtraTorrent => new TorrentSite
         {
-            ListUrl = "http://extratorrent.cc/category/49/Thriller+Torrents.html",
+            ListUrl = "http://extratorrent.cc/view/popular/Movies.html",
             PageBaseUrl = "http://extratorrent.cc",
             ListItemSelector = "table.tl > tbody > tr > td.tli > a"
         };
 
-        public static TorrentSite Kat => new TorrentSite
+        public static TorrentSite _1337x => new TorrentSite
         {
-            ListUrl = "https://kat.cr/movies/?field=seeders&sorder=desc",
-            PageBaseUrl = "https://kat.cr/",
-            ListItemSelector = "table > tbody > tr > td > div.torrentname > div > a"
-        };
+            ListUrl = "http://1337x.to/top-100-movies",
+            PageBaseUrl = "http://1337x.to",
+            ListItemSelector = "div.featured-box.top-100 > div.tab-detail > ul > li > div.coll-1 > strong > a"
+        };        
     }
 }

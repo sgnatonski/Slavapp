@@ -44,9 +44,9 @@ namespace PirateCinema
 
                 var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, SubtitleLanguage.Polish, _cancelToken.Token);
                 var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, SubtitleLanguage.Polish, _cancelToken.Token);
-                //var moviesSource3 = worker.Work(TorrentSiteProvider.Kat, SubtitleLanguage.Polish, cancelToken.Token);
+                var moviesSource3 = worker.Work(TorrentSiteProvider._1337x, SubtitleLanguage.Polish, _cancelToken.Token);
 
-                var moviesMerged = moviesSource1.Merge(moviesSource2);
+                var moviesMerged = moviesSource1.Merge(moviesSource2).Merge(moviesSource3);
 
                 moviesMerged.Subscribe(tm => Application.Current.Dispatcher.Invoke(() => movieList.List.Add(tm)), _cancelToken.Token);
             });
