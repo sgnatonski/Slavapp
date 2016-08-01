@@ -61,7 +61,5 @@ namespace TorrentBrowser
                 return Disposable.Empty;
             });
         }
-
-        
     }
 }

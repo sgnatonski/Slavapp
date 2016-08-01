@@ -11,37 +11,29 @@ namespace PirateCinema
 {
     public class MainViewModel : ReactiveObject
     {
+        private readonly CancellationTokenSource _cancelToken = new CancellationTokenSource();
+
+        private IReadOnlyReactiveList<TorrentMovie> _moviesList;
+
         public MainViewModel()
         {
             Application.Current.Exit += Current_Exit;
 
             FetchCommand = ReactiveCommand.CreateAsyncObservable(_ => FetchMovies());
 
-            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
-
-            MoviesList = movies.ByRatingWithSubtitle;
-        }
-
-        private void Current_Exit(object sender, ExitEventArgs e)
-        {
-            _cancelToken.Cancel();
+            InitializeCachedList();
         }
 
         public ICommand FetchCommand { get; set; }
 
-        private IReadOnlyReactiveList<TorrentMovie> _moviesList;
         public IReadOnlyReactiveList<TorrentMovie> MoviesList
         {
             get { return _moviesList; }
             set { this.RaiseAndSetIfChanged(ref _moviesList, value); }
         }
 
-        private CancellationTokenSource _cancelToken = new CancellationTokenSource();
-
         public IObservable<Unit> FetchMovies()
         {
-            _cancelToken = new CancellationTokenSource();
-
             var movieList = MovieListFactory.Build();
 
             MoviesList = movieList.ByRatingWithSubtitle;
@@ -65,5 +57,17 @@ namespace PirateCinema
                 });
             });
         }
-    }    
+
+        private void InitializeCachedList()
+        {
+            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
+
+            MoviesList = movies.ByRatingWithSubtitle;
+        }
+
+        private void Current_Exit(object sender, ExitEventArgs e)
+        {
+            _cancelToken.Cancel();
+        }
+    }
 }
