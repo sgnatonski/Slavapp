@@ -17,6 +17,7 @@ namespace TorrentBrowser
             var entries = cells.Select(m => new TorrentEntry
             {
                 Title = m.TextContent,
+                Quality = TorrentQualityExtractor.ExtractQuality(m.TextContent),
                 TorrentPage = site.PageBaseUrl + m.GetAttribute("href")?.Trim(),
                 TorrentUri = new Uri(site.PageBaseUrl + m.GetAttribute("href")?.Trim())
             });

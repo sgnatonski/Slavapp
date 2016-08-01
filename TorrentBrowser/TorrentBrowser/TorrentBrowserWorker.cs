@@ -29,7 +29,6 @@ namespace TorrentBrowser
 
                 var movies = pages.AsParallel().Select(async p =>
                 {
-                    var quality = TorrentQualityExtractor.ExtractQuality(p.Title);
                     var page = await PirateRequest.OpenAsync(p.TorrentUri, cancellationToken);
                     var imdbUri = TorrentImdbLinkExtractor.ExtractImdbLink(page);
                     var imdbId = TorrentImdbLinkExtractor.ExtractImdbId(imdbUri);
@@ -40,7 +39,7 @@ namespace TorrentBrowser
                         {
                             TorrentLink = p.TorrentUri,
                             Movie = p.TorrentPage.Split('/').LastOrDefault(),
-                            Quality = quality
+                            Quality = p.Quality
                         };
                     }
                     
@@ -62,7 +61,7 @@ namespace TorrentBrowser
                         PictureUrl = imdbData.PictureLink,
                         Movie = (imdbData.MovieName ?? p.Title).Trim(),
                         Rating = imdbData.Rating.GetValueOrDefault(),
-                        Quality = quality,
+                        Quality = p.Quality,
                         Subtitles = subtitles,
                         LastUpdated = DateTime.Now
                     };
