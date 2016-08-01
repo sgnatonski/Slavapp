@@ -29,11 +29,9 @@ namespace TorrentBrowser
 
                 var movies = pages.AsParallel().Select(async p =>
                 {
-                    var page = await PirateRequest.OpenAsync(p.TorrentUri, cancellationToken);
-                    var imdbUri = TorrentImdbLinkExtractor.ExtractImdbLink(page);
-                    var imdbId = TorrentImdbLinkExtractor.ExtractImdbId(imdbUri);
+                    var imdbEntry = await TorrentImdbEntryExtractor.ExtractImdbEntry(p.TorrentUri, cancellationToken);
 
-                    if (imdbUri == null || imdbId == 0)
+                    if (!imdbEntry.IsValid)
                     {
                         return new TorrentMovie
                         {
@@ -43,21 +41,21 @@ namespace TorrentBrowser
                         };
                     }
                     
-                    var cacheMovie = _repository.Get(imdbUri);
+                    var cacheMovie = _repository.Get(imdbEntry.ImdbLink);
                     if (cacheMovie != null)
                     {
                         Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
                         return cacheMovie;
                     }
                     
-                    var imdbData = await ImdbDataExtractor.ExtractData(imdbUri, cancellationToken);
-                    var subtitles = await OpenSubtitles.GetSubtitles(imdbId, "pol");
+                    var imdbData = await ImdbDataExtractor.ExtractData(imdbEntry.ImdbLink, cancellationToken);
+                    var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, "pol");
 
                     var movie = new TorrentMovie
                     {
-                        Id = imdbData.Id,
+                        Id = imdbEntry.ImdbId,
                         TorrentLink = p.TorrentUri,
-                        ImdbLink = imdbUri,
+                        ImdbLink = imdbEntry.ImdbLink,
                         PictureUrl = imdbData.PictureLink,
                         Movie = (imdbData.MovieName ?? p.Title).Trim(),
                         Rating = imdbData.Rating.GetValueOrDefault(),
@@ -66,7 +64,7 @@ namespace TorrentBrowser
                         LastUpdated = DateTime.Now
                     };
 
-                    _repository.Add(imdbUri, movie);
+                    _repository.Add(imdbEntry.ImdbLink, movie);
 
                     return movie;
                 });
