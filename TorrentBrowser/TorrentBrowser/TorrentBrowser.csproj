@@ -73,9 +73,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeTorrentBrowserWorker.cs" />
+    <Compile Include="ImdbQueryProvider.cs" />
+    <Compile Include="OpenSubtitles.cs" />
+    <Compile Include="PirateRequestFactory.cs" />
+    <Compile Include="QualityExtractor.cs" />
     <Compile Include="TorrentBrowserWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TorrentMovie.cs" />
+    <Compile Include="TorrentMovieCache.cs" />
     <Compile Include="TorrentSite.cs" />
   </ItemGroup>
   <ItemGroup>
