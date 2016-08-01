@@ -124,6 +124,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MovieList.cs" />
+    <Compile Include="MovieListFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
