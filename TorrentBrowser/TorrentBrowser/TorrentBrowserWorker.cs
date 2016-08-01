@@ -25,20 +25,15 @@ namespace TorrentBrowser
         {
             return Observable.Create<TorrentMovie>(observer =>
             {
-                var pages = TorrentList.GetTorrents(site, cancellationToken);
+                var torrents = TorrentList.GetTorrents(site, cancellationToken);
 
-                var movies = pages.AsParallel().Select(async p =>
+                var movies = torrents.AsParallel().Select(async torrent =>
                 {
-                    var imdbEntry = await TorrentImdbEntryExtractor.ExtractImdbEntry(p.TorrentUri, cancellationToken);
+                    var imdbEntry = await TorrentImdbEntryExtractor.ExtractImdbEntry(torrent.TorrentUri, cancellationToken);
 
                     if (!imdbEntry.IsValid)
                     {
-                        return new TorrentMovie
-                        {
-                            TorrentLink = p.TorrentUri,
-                            Movie = p.TorrentPage.Split('/').LastOrDefault(),
-                            Quality = p.Quality
-                        };
+                        return TorrentMovieFactory.CreateTorrentMovie(torrent);
                     }
                     
                     var cacheMovie = _repository.Get(imdbEntry.ImdbLink);
@@ -51,20 +46,9 @@ namespace TorrentBrowser
                     var imdbData = await ImdbDataExtractor.ExtractData(imdbEntry.ImdbLink, cancellationToken);
                     var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, "pol");
 
-                    var movie = new TorrentMovie
-                    {
-                        Id = imdbEntry.ImdbId,
-                        TorrentLink = p.TorrentUri,
-                        ImdbLink = imdbEntry.ImdbLink,
-                        PictureUrl = imdbData.PictureLink,
-                        Movie = (imdbData.MovieName ?? p.Title).Trim(),
-                        Rating = imdbData.Rating.GetValueOrDefault(),
-                        Quality = p.Quality,
-                        Subtitles = subtitles,
-                        LastUpdated = DateTime.Now
-                    };
+                    var movie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry, imdbData, subtitles);
 
-                    _repository.Add(imdbEntry.ImdbLink, movie);
+                    _repository.Add(movie.ImdbLink, movie);
 
                     return movie;
                 });
@@ -77,5 +61,7 @@ namespace TorrentBrowser
                 return Disposable.Empty;
             });
         }
+
+        
     }
 }

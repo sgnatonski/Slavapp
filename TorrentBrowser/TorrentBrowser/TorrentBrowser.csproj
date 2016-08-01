@@ -80,6 +80,7 @@
     <Compile Include="ImdbQueryProvider.cs" />
     <Compile Include="OpenSubtitles.cs" />
     <Compile Include="PirateRequest.cs" />
+    <Compile Include="TorrentMovieFactory.cs" />
     <Compile Include="TorrentQualityExtractor.cs" />
     <Compile Include="TorrentBrowserWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
