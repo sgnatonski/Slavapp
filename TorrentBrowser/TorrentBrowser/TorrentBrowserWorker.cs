@@ -41,7 +41,7 @@ namespace TorrentBrowser
                 if (!cells.Any())
                 {
                     observer.OnCompleted();
-                    return Disposable.Create(() => Console.WriteLine("Observer has unsubscribed"));
+                    return Disposable.Empty;
                 }
 
                 var pages = cells.Select(m => new MovieTitle { Title = m.TextContent, Page = m.GetAttribute("href")?.Trim() });
@@ -110,7 +110,7 @@ namespace TorrentBrowser
                       .Do(observer.OnNext, observer.OnCompleted)
                       .Wait();
 
-                return Disposable.Create(() => Console.WriteLine("Observer has unsubscribed"));
+                return Disposable.Empty;
             });
         }
 
