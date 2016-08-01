@@ -13,16 +13,14 @@ namespace TorrentBrowser
             var document = await PirateRequest.OpenAsync(uri, cancellationToken);
             var links = document.QuerySelectorAll("a");
             var tmp = links.Select(x => x.GetAttribute("href")?.Trim('\r', '\n')).ToList();
-            var imdbLink = tmp.FirstOrDefault(x => x != null && x.StartsWith("http://www.imdb.com/title/"))
-                .Replace("reference", "")
-                .TrimEnd('/') + "/";
+            var imdbLink = tmp.FirstOrDefault(x => x != null && x.StartsWith("http://www.imdb.com/title/"));
 
             if (string.IsNullOrEmpty(imdbLink))
             {
                 return new TorrentImdbEntry();
             }
 
-            var imdbUri = new Uri(imdbLink);
+            var imdbUri = new Uri(imdbLink.Replace("reference", "").TrimEnd('/') + "/");
 
             return new TorrentImdbEntry
             {
