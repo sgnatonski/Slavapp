@@ -9,11 +9,11 @@ namespace TorrentBrowser
 {
     public class TorrentBrowserWorker
     {
-        private readonly TorrentMovieRepository _repository;
+        private readonly TorrentMovieCachedRepository _repository;
 
         public TorrentBrowserWorker()
         {
-            _repository = new TorrentMovieRepository();
+            _repository = new TorrentMovieCachedRepository();
         }
         
         public IEnumerable<TorrentMovie> GetCache()
