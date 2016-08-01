@@ -8,6 +8,8 @@ namespace TorrentBrowser
 {
     public static class TorrentList
     {
+        private static readonly string[] Filter = {"dvdscr", "camrip", "hdcam", ".tc.", "hdtc", "hdts", "hd-ts"};
+
         public static IEnumerable<TorrentEntry> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
         {
             var pob = Observable.FromAsync(() => PirateRequest.OpenAsync(new Uri(site.ListUrl), cancellationToken));
@@ -28,14 +30,9 @@ namespace TorrentBrowser
         private static IEnumerable<TorrentEntry> FilterMovies(IEnumerable<TorrentEntry> movies)
         {
             return movies
-                        .Where(p => p.TorrentPage != null
-                        && !p.TorrentPage.ToLower().Contains("dvdscr")
-                        && !p.TorrentPage.ToLower().Contains("camrip")
-                        && !p.TorrentPage.ToLower().Contains("hdcam")
-                        && !p.TorrentPage.ToLower().Contains(".tc.")
-                        && !p.TorrentPage.ToLower().Contains("hdtc")
-                        && !p.TorrentPage.ToLower().Contains("hdts")
-                        && !p.TorrentPage.ToLower().Contains("hd-ts"));
+                .Select(x => new { Torrent = x, TorrentPage = (x.TorrentPage ?? string.Empty).ToLower() })
+                .Where(p => !Filter.Any(p.TorrentPage.Contains))
+                .Select(x => x.Torrent);
         }
     }
 }
