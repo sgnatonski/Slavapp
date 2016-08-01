@@ -1,5 +1,4 @@
-﻿using AngleSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -10,12 +9,6 @@ namespace TorrentBrowser
 {
     public class TorrentBrowserWorker
     {
-        private class MovieTitle
-        {
-            public string Title { get; set; }
-            public string Page { get; set; }
-        }
-
         private readonly TorrentMovieCache _cache;
 
         public TorrentBrowserWorker()
@@ -31,71 +24,46 @@ namespace TorrentBrowser
         public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
         {
             return Observable.Create<TorrentMovie>(observer =>
-            {                
-                var config = Configuration.Default.WithDefaultLoader();
-                var browsingContext = BrowsingContext.New(config);
-                var pob = Observable.FromAsync(() => browsingContext.OpenAsync(PirateRequestFactory.Build(site.ListUrl), cancellationToken));
-                var document = pob.Wait();                
-                var cells = document.QuerySelectorAll(site.ListItemSelector).ToList();
+            {
+                var pages = TorrentList.GetTorrents(site, cancellationToken);
 
-                if (!cells.Any())
+                var movies = pages.AsParallel().Select(async p =>
                 {
-                    observer.OnCompleted();
-                    return Disposable.Empty;
-                }
+                    var page = await PirateRequest.OpenAsync(p.TorrentUri, cancellationToken);
+                    var imdbUri = TorrentImdbLinkExtractor.ExtractImdbLink(page);
 
-                var pages = cells.Select(m => new MovieTitle { Title = m.TextContent, Page = m.GetAttribute("href")?.Trim() });
-                var movies = FilterMovies(pages).AsParallel().Select(async p =>
-                {
-                    var torrentLink = site.PageBaseUrl + p.Page;
-                    var page = await browsingContext.OpenAsync(PirateRequestFactory.Build(torrentLink), cancellationToken);
-                    var links = page.QuerySelectorAll("a");
-                    var tmp = links.Select(x => x.GetAttribute("href")?.Trim('\r', '\n')).ToList();
-                    var imdbLink = tmp.FirstOrDefault(x => x != null && x.StartsWith("http://www.imdb.com/title/"));
-
-                    if (imdbLink == null)
+                    if (imdbUri == null)
                     {
                         return new TorrentMovie
                         {
-                            TorrentLink = new Uri(torrentLink),
-                            Movie = p.Page.Split('/').LastOrDefault(),
-                            Quality = QualityExtractor.ExtractQuality(p.Title)
+                            TorrentLink = p.TorrentUri,
+                            Movie = p.TorrentPage.Split('/').LastOrDefault(),
+                            Quality = TorrentQualityExtractor.ExtractQuality(p.Title)
                         };
                     }
-
-                    var imdbUri = new Uri(imdbLink.Replace("reference", "").TrimEnd('/') + "/");
 
                     var cacheMovie = _cache.Get(imdbUri);
                     if (cacheMovie != null)
                     {
                         return cacheMovie;
                     }
-
-                    var imdbPage = await browsingContext.OpenAsync(PirateRequestFactory.Build(imdbUri.AbsoluteUri), cancellationToken);
-                    var imdbQueries = new ImdbQueryProvider();
-                    var movieName = imdbPage.QuerySelector(imdbQueries.OriginalTitleQuery)?.TextContent.Replace("(original title)", "")
-                                 ?? imdbPage.QuerySelector(imdbQueries.TitleQuery)?.TextContent;
-                    var rating = imdbPage.QuerySelector(imdbQueries.RatingQuery)?.TextContent;
-                    var pictureUrl = imdbPage.QuerySelector(imdbQueries.PictureQuery)?.GetAttribute("src");
-                    Console.WriteLine($"{(movieName ?? p.Title).Trim()} IMDB rating: {rating ?? "no IMDB data"}");
-
-                    var id = 0;
-                    int.TryParse(imdbUri.Segments[2].Substring(2).TrimEnd('/'), out id);
+                    
+                    var imdbData = await ImdbDataExtractor.ExtractData(imdbUri, cancellationToken);
                     
                     var movie = new TorrentMovie
                     {
-                        Id = id,
-                        TorrentLink = torrentLink != null ? new Uri(torrentLink) : null,
+                        Id = imdbData.Id,
+                        TorrentLink = p.TorrentUri,
                         ImdbLink = imdbUri,
-                        PictureUrl = pictureUrl != null ? new Uri(pictureUrl) : null,
-                        Movie = (movieName ?? p.Title).Trim(),
-                        Rating = float.Parse(rating ?? "0", System.Globalization.CultureInfo.InvariantCulture),
-                        Quality = QualityExtractor.ExtractQuality(p.Title),
-                        Subtitles = OpenSubtitles.GetSubtitles(id, "pol"),
+                        PictureUrl = imdbData.PictureLink,
+                        Movie = (imdbData.MovieName ?? p.Title).Trim(),
+                        Rating = imdbData.Rating.GetValueOrDefault(),
+                        Quality = TorrentQualityExtractor.ExtractQuality(p.Title),
+                        Subtitles = OpenSubtitles.GetSubtitles(imdbData.Id, "pol"),
                         LastUpdated = DateTime.Now
                     };
 
-                    if (id == 0)
+                    if (imdbData.Id == 0)
                     {
                         return movie;
                     }
@@ -112,19 +80,6 @@ namespace TorrentBrowser
 
                 return Disposable.Empty;
             });
-        }
-
-        private IEnumerable<MovieTitle> FilterMovies(IEnumerable<MovieTitle> movies)
-        {
-            return movies
-                        .Where(p => p.Page != null
-                        && !p.Page.ToLower().Contains("dvdscr")
-                        && !p.Page.ToLower().Contains("camrip")
-                        && !p.Page.ToLower().Contains("hdcam")
-                        && !p.Page.ToLower().Contains(".tc.")
-                        && !p.Page.ToLower().Contains("hdtc")
-                        && !p.Page.ToLower().Contains("hdts")
-                        && !p.Page.ToLower().Contains("hd-ts"));
         }
     }
 }
