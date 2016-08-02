@@ -49,7 +49,8 @@ namespace TorrentBrowser
                 Movie = "Test1",
                 Rating = 9.0F,
                 ImdbLink = new Uri("http://www.imdb.com/title/tt3385516/"),
-                PictureUrl = new Uri("http://ia.media-imdb.com/images/M/MV5BMTc3NTUzNTI4MV5BMl5BanBnXkFtZTgwNjU0NjU5NzE@._V1_UX182_CR0,0,182,268_AL_.jpg")
+                PictureUrl = new Uri("http://ia.media-imdb.com/images/M/MV5BMTc3NTUzNTI4MV5BMl5BanBnXkFtZTgwNjU0NjU5NzE@._V1_UX182_CR0,0,182,268_AL_.jpg"),
+                Subtitles = new[]{ "1", "2" }
             };
         }
     }
