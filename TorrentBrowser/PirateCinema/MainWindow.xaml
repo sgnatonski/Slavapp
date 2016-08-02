@@ -40,7 +40,7 @@
                                     <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{Binding Movie}" Grid.ColumnSpan="6" Margin="4" />
-                                <TextBlock Text="{Binding Rating}" Grid.Row="1" Grid.Column="0" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Rating, StringFormat=N1}" Grid.Row="1" Grid.Column="0" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Quality}" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <TextBlock Grid.Row="1" Grid.Column="3" Visibility="{Binding HasImdbLink, Converter={StaticResource bool2VisibilityConverter}}">
                                     <Hyperlink NavigateUri="{Binding ImdbLink}" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="None">
