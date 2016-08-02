@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -15,11 +16,14 @@ namespace PirateCinema
 
         private IReadOnlyReactiveList<TorrentMovie> _moviesList;
 
+        private string _selectedLangId;
+
         public MainViewModel()
         {
             Application.Current.Exit += Current_Exit;
 
             FetchCommand = ReactiveCommand.CreateAsyncObservable(_ => FetchMovies());
+            SelectedLangId = SubtitleLanguage.FromCurrentCulture();
 
             InitializeCachedList();
         }
@@ -32,6 +36,12 @@ namespace PirateCinema
             set { this.RaiseAndSetIfChanged(ref _moviesList, value); }
         }
 
+        public string SelectedLangId
+        {
+            get { return _selectedLangId; }
+            set { this.RaiseAndSetIfChanged(ref _selectedLangId, value); }
+        }
+
         public IObservable<Unit> FetchMovies()
         {
             var movieList = MovieListFactory.Build();
@@ -40,11 +50,11 @@ namespace PirateCinema
 
             return Observable.Start(() =>
             {
-                var worker = new TorrentBrowserWorker();
+                var worker = new TorrentBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId));
 
-                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, SubtitleLanguage.Polish, _cancelToken.Token);
-                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, SubtitleLanguage.Polish, _cancelToken.Token);
-                var moviesSource3 = worker.Work(TorrentSiteProvider._1337x, SubtitleLanguage.Polish, _cancelToken.Token);
+                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, _cancelToken.Token);
+                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, _cancelToken.Token);
+                var moviesSource3 = worker.Work(TorrentSiteProvider._1337x, _cancelToken.Token);
 
                 moviesSource1
                     .Merge(moviesSource2)
@@ -56,7 +66,7 @@ namespace PirateCinema
 
         private void InitializeCachedList()
         {
-            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
+            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId)).GetCache()));
 
             MoviesList = movies.ByRatingWithSubtitle;
         }

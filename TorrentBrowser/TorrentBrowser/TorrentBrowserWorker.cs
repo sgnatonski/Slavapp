@@ -11,17 +11,20 @@ namespace TorrentBrowser
     {
         private readonly TorrentMovieCachedRepository _repository;
 
-        public TorrentBrowserWorker()
+        private readonly SubtitleLanguage _subtitleLang;
+
+        public TorrentBrowserWorker(SubtitleLanguage subtitleLang)
         {
+            _subtitleLang = subtitleLang;
             _repository = new TorrentMovieCachedRepository();
         }
-        
+
         public IEnumerable<TorrentMovie> GetCache()
         {
             return _repository.GetAll();
         }
 
-        public IObservable<TorrentMovie> Work(TorrentSite site, SubtitleLanguage subtitleLang, CancellationToken cancellationToken)
+        public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
         {
             return Observable.Create<TorrentMovie>(observer =>
             {
@@ -45,7 +48,7 @@ namespace TorrentBrowser
                     }
                     
                     var imdbData = await ImdbDataExtractor.ExtractData(imdbEntry.ImdbLink, cancellationToken);
-                    var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, subtitleLang);
+                    var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, _subtitleLang);
 
                     var movie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry, imdbData, subtitles);
 
