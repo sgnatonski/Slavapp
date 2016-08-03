@@ -59,6 +59,7 @@ namespace PirateCinema
                 moviesSource1
                     .Merge(moviesSource2)
                     .Merge(moviesSource3)
+                    .Distinct(x => x.Id)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(movieList.List.Add, _cancelToken.Token);
             });
