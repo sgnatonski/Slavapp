@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,8 +12,9 @@ namespace TorrentBrowser
     {
         private static readonly string[] Filter = {"dvdscr", "camrip", "hdcam", ".tc.", "hdtc", "hdts", "hd-ts"};
 
-        public static async Task<IEnumerable<TorrentEntry>> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
+        public static async Task<IObservable<TorrentEntry>> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
         {
+            Debug.WriteLine($"Getting {site.PageBaseUrl} torrent list");
             var document = await PirateRequest.OpenAsync(new Uri(site.ListUrl), cancellationToken);
             var entries = document.QuerySelectorAll(site.ListItemSelector)
                 .Select(c => new { Text = c.TextContent, Href = c.GetAttribute("href")?.Trim() })
@@ -23,7 +26,7 @@ namespace TorrentBrowser
                     TorrentUri = new Uri(site.PageBaseUrl + m.Href)
                 });
 
-            return FilterMovies(entries);
+            return Observable.ToObservable(FilterMovies(entries));
         }
 
         private static IEnumerable<TorrentEntry> FilterMovies(IEnumerable<TorrentEntry> movies)
