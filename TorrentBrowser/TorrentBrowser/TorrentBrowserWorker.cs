@@ -9,19 +9,21 @@ namespace TorrentBrowser
 {
     public class TorrentBrowserWorker
     {
-        private readonly TorrentMovieCachedRepository _repository;
+        private readonly TorrentMovieCachedRepository _torrentRepository;
+        private readonly ImdbMovieRepository _imdbRepository;
 
         private readonly SubtitleLanguage _subtitleLang;
 
         public TorrentBrowserWorker(SubtitleLanguage subtitleLang)
         {
             _subtitleLang = subtitleLang;
-            _repository = new TorrentMovieCachedRepository();
+            _torrentRepository = new TorrentMovieCachedRepository();
+            _imdbRepository = new ImdbMovieRepository();
         }
 
         public IEnumerable<TorrentMovie> GetCache()
         {
-            return _repository.GetAll();
+            return _torrentRepository.GetAll();
         }
 
         public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
@@ -40,19 +42,21 @@ namespace TorrentBrowser
                         return TorrentMovieFactory.CreateTorrentMovie(torrent);
                     }
                     
-                    var cacheMovie = _repository.Get(imdbEntry.ImdbLink);
+                    var cacheMovie = _torrentRepository.Get(imdbEntry.ImdbLink);
                     if (cacheMovie != null)
                     {
                         Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
                         return cacheMovie;
                     }
                     
-                    var imdbData = await ImdbDataExtractor.ExtractData(imdbEntry.ImdbLink, cancellationToken);
+                    var imdbData = _imdbRepository.GetById(imdbEntry.ImdbId) 
+                                    ?? await ImdbDataExtractor.ExtractData(imdbEntry.ImdbId, cancellationToken);
                     var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, _subtitleLang);
 
                     var movie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry, imdbData, subtitles);
 
-                    _repository.Add(movie.ImdbLink, movie);
+                    _imdbRepository.Add(imdbData);
+                    _torrentRepository.Add(movie.ImdbLink, movie);
 
                     return movie;
                 });

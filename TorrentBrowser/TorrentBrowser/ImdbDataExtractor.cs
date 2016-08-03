@@ -6,9 +6,9 @@ namespace TorrentBrowser
 {
     public static class ImdbDataExtractor
     {
-        public static async Task<ImdbData> ExtractData(Uri uri, CancellationToken cancellationToken)
+        public static async Task<ImdbData> ExtractData(int imdbId, CancellationToken cancellationToken)
         {
-            var imdbPage = await PirateRequest.OpenAsync(uri, cancellationToken);
+            var imdbPage = await PirateRequest.OpenAsync(new Uri($"http://www.imdb.com/title/tt{imdbId}/"), cancellationToken);
             var imdbQueries = new ImdbQueryProvider();
 
             var originalTitle = imdbPage.QuerySelector(imdbQueries.OriginalTitleQuery)?.TextContent.Replace("(original title)", "");
@@ -20,6 +20,7 @@ namespace TorrentBrowser
 
             return new ImdbData
             {
+                Id = imdbId,
                 MovieName = movieName,
                 Rating = !string.IsNullOrEmpty(rating) ? (float?)float.Parse(rating, System.Globalization.CultureInfo.InvariantCulture) : null,
                 PictureLink = pictureUrl != null ? new Uri(pictureUrl) : null
