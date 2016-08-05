@@ -18,7 +18,7 @@ namespace PirateCinema
         {
             Application.Current.Exit += Current_Exit;
 
-            FetchCommand = ReactiveCommand.CreateAsyncObservable(_ => FetchMovies());
+            FetchCommand = ReactiveCommand.CreateAsyncObservable(FetchMovies);
             SelectedLangId = SubtitleLanguage.FromCurrentCulture();
 
             InitializeCachedList();
@@ -32,23 +32,26 @@ namespace PirateCinema
         [Reactive]
         public string SelectedLangId { get; set; }
 
-        public IObservable<Unit> FetchMovies()
+        public IObservable<TorrentMovie> FetchMovies(object param)
         {
             var movieList = MovieListFactory.Build();
 
             MoviesList = movieList.ByRatingWithSubtitle;
-
-            return Observable.Start(() =>
+            
+            var observable = Observable.Start(() =>
             {
                 var torrentWorker = new TorrentWorkerFacade(SubtitleLanguage.FromIsoName(SelectedLangId), _cancelToken.Token);
 
-                torrentWorker.Work(
-                    TorrentSiteProvider.PirateBay, 
-                    TorrentSiteProvider.ExtraTorrent, 
-                    TorrentSiteProvider._1337x)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(movieList.List.Add, _cancelToken.Token);
-            });
+                return torrentWorker.Work(
+                    TorrentSiteProvider.PirateBay,
+                    TorrentSiteProvider.ExtraTorrent,
+                    TorrentSiteProvider._1337x);
+            }).Merge();
+
+            observable.ObserveOn(RxApp.MainThreadScheduler)
+                      .Subscribe(movieList.List.Add, _cancelToken.Token);
+
+            return observable;
         }
 
         private void InitializeCachedList()

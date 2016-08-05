@@ -22,9 +22,9 @@ namespace TorrentBrowser
         public IObservable<TorrentMovieSource> Work(TorrentSite site, CancellationToken cancellationToken)
         {
             var torrents = TorrentList.GetTorrents(site, cancellationToken).Result;
-            var movies = torrents.Select(torrent => GetMovie(torrent, cancellationToken).Wait());
+            var movies = torrents.Select(torrent => GetMovie(torrent, cancellationToken));
 
-            return movies;            
+            return movies.Merge();            
         }
 
         public IObservable<TorrentMovieSource> UpdateCache(IObservable<TorrentMovieSource> torrents)
