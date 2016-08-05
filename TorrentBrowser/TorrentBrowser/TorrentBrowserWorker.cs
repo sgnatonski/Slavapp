@@ -36,29 +36,17 @@ namespace TorrentBrowser
                 
                 if (!imdbEntry.IsValid)
                 {
-                    return new TorrentMovieSource
-                    {
-                        TorrentMovie = TorrentMovieFactory.CreateTorrentMovie(torrent),
-                        State = TorrentMovieState.Invalid
-                    };
+                    return TorrentMovieSourceFactory.GetInvalidTorrentMovieSource(torrent);
                 }
                 
                 var cacheMovie = _torrentRepository.Get(imdbEntry.ImdbLink);
                 if (cacheMovie != null)
                 {
                     Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
-                    return new TorrentMovieSource
-                    {
-                        TorrentMovie = cacheMovie,
-                        State = TorrentMovieState.Complete
-                    };
+                    return TorrentMovieSourceFactory.GetCompleteTorrentMovieSource(cacheMovie);
                 }
 
-                return new TorrentMovieSource
-                {
-                    TorrentMovie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry),
-                    State = TorrentMovieState.Incomplete
-                };
+                return TorrentMovieSourceFactory.GetIncompleteTorrentMovieSource(torrent, imdbEntry);
             });            
         }
     }

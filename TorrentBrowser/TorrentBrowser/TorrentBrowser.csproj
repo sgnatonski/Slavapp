@@ -86,6 +86,7 @@
     <Compile Include="TorrentMovieFactory.cs" />
     <Compile Include="TorrentMovieCachedRepository.cs" />
     <Compile Include="ImdbMovieRepository.cs" />
+    <Compile Include="TorrentMovieSourceFactory.cs" />
     <Compile Include="TorrentQualityExtractor.cs" />
     <Compile Include="TorrentBrowserWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
