@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -50,19 +49,12 @@ namespace PirateCinema
 
             return Observable.Start(() =>
             {
-                var imdbWorker = new ImdbBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId));
-                var torrentWorker = new TorrentBrowserWorker();
+                var torrentWorker = new TorrentWorkerFacade(SubtitleLanguage.FromIsoName(SelectedLangId), _cancelToken.Token);
 
-                var moviesSource1 = torrentWorker.Work(TorrentSiteProvider.PirateBay, _cancelToken.Token);
-                var moviesSource2 = torrentWorker.Work(TorrentSiteProvider.ExtraTorrent, _cancelToken.Token);
-                var moviesSource3 = torrentWorker.Work(TorrentSiteProvider._1337x, _cancelToken.Token);
-
-                var torrents = moviesSource1
-                    .Merge(moviesSource2)
-                    .Merge(moviesSource3);
-
-                imdbWorker.Work(torrents, _cancelToken.Token)
-                    .Distinct(x => x.Id)
+                torrentWorker.Work(
+                    TorrentSiteProvider.PirateBay, 
+                    TorrentSiteProvider.ExtraTorrent, 
+                    TorrentSiteProvider._1337x)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(movieList.List.Add, _cancelToken.Token);
             });
