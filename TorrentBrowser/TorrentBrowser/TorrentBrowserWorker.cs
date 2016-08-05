@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 
@@ -28,6 +27,11 @@ namespace TorrentBrowser
             return movies;            
         }
 
+        public IObservable<TorrentMovieSource> UpdateCache(IObservable<TorrentMovieSource> torrents)
+        {
+            return torrents.Select(UpdateCache);
+        }
+
         private IObservable<TorrentMovieSource> GetMovie(TorrentEntry torrent, CancellationToken cancellationToken)
         {
             return Observable.FromAsync(async () =>
@@ -36,18 +40,27 @@ namespace TorrentBrowser
                 
                 if (!imdbEntry.IsValid)
                 {
-                    return TorrentMovieSourceFactory.GetInvalidTorrentMovieSource(torrent);
+                    return TorrentMovieSourceFactory.CreateInvalidTorrentMovieSource(torrent);
                 }
                 
                 var cacheMovie = _torrentRepository.Get(imdbEntry.ImdbLink);
                 if (cacheMovie != null)
                 {
                     Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
-                    return TorrentMovieSourceFactory.GetCompleteTorrentMovieSource(cacheMovie);
+                    return TorrentMovieSourceFactory.CreateCompleteTorrentMovieSource(cacheMovie);
                 }
 
-                return TorrentMovieSourceFactory.GetIncompleteTorrentMovieSource(torrent, imdbEntry);
+                return TorrentMovieSourceFactory.CreateIncompleteTorrentMovieSource(torrent, imdbEntry);
             });            
+        }
+
+        private TorrentMovieSource UpdateCache(TorrentMovieSource torrent)
+        {
+            if (torrent.State == TorrentMovieState.Complete)
+            {
+                _torrentRepository.Add(torrent.TorrentMovie.ImdbLink, torrent.TorrentMovie);
+            }
+            return torrent;
         }
     }
 }

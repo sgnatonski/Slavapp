@@ -6,7 +6,6 @@ namespace TorrentBrowser
 {
     public class ImdbBrowserWorker
     {
-        private readonly TorrentMovieCachedRepository _torrentRepository;
         private readonly ImdbMovieRepository _imdbRepository;
 
         private readonly SubtitleLanguage _subtitleLang;
@@ -14,24 +13,23 @@ namespace TorrentBrowser
         public ImdbBrowserWorker(SubtitleLanguage subtitleLang)
         {
             _subtitleLang = subtitleLang;
-            _torrentRepository = new TorrentMovieCachedRepository();
             _imdbRepository = new ImdbMovieRepository();
         }
 
-        public IObservable<TorrentMovie> Work(IObservable<TorrentMovieSource> torrents, CancellationToken cancellationToken)
+        public IObservable<TorrentMovieSource> Work(IObservable<TorrentMovieSource> torrents, CancellationToken cancellationToken)
         {
             var movies = torrents.Select(torrent => GetMovie(torrent, cancellationToken).Wait());
 
             return movies;            
         }
 
-        private IObservable<TorrentMovie> GetMovie(TorrentMovieSource torrent, CancellationToken cancellationToken)
+        private IObservable<TorrentMovieSource> GetMovie(TorrentMovieSource torrent, CancellationToken cancellationToken)
         {
             return Observable.FromAsync(async () =>
             {
                 if (torrent.State != TorrentMovieState.Incomplete)
                 {
-                    return torrent.TorrentMovie;
+                    return torrent;
                 }
 
                 var imdbData = _imdbRepository.GetById(torrent.TorrentMovie.Id)
@@ -41,10 +39,8 @@ namespace TorrentBrowser
 
                 var subtitles = await OpenSubtitles.GetSubtitles(torrent.TorrentMovie.Id, _subtitleLang);
 
-                var movie = TorrentMovieFactory.CreateTorrentMovie(torrent.TorrentMovie, imdbData, subtitles);
-
-                _torrentRepository.Add(movie.ImdbLink, movie);
-
+                var movie = TorrentMovieSourceFactory.CreateCompleteTorrentMovieSource(torrent.TorrentMovie, imdbData, subtitles);
+                
                 return movie;
             });            
         }
