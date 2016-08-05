@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using TorrentBrowser;
 
 namespace PirateCinema
@@ -12,10 +13,6 @@ namespace PirateCinema
     public class MainViewModel : ReactiveObject, IDisposable
     {
         private readonly CancellationTokenSource _cancelToken = new CancellationTokenSource();
-
-        private IReadOnlyReactiveList<TorrentMovie> _moviesList;
-
-        private string _selectedLangId;
 
         public MainViewModel()
         {
@@ -29,17 +26,11 @@ namespace PirateCinema
 
         public ICommand FetchCommand { get; set; }
 
-        public IReadOnlyReactiveList<TorrentMovie> MoviesList
-        {
-            get { return _moviesList; }
-            set { this.RaiseAndSetIfChanged(ref _moviesList, value); }
-        }
+        [Reactive]
+        public IReadOnlyReactiveList<TorrentMovie> MoviesList { get; set; }
 
-        public string SelectedLangId
-        {
-            get { return _selectedLangId; }
-            set { this.RaiseAndSetIfChanged(ref _selectedLangId, value); }
-        }
+        [Reactive]
+        public string SelectedLangId { get; set; }
 
         public IObservable<Unit> FetchMovies()
         {
