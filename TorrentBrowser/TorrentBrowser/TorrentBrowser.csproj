@@ -76,11 +76,13 @@
     <Compile Include="ImdbData.cs" />
     <Compile Include="ImdbDataExtractor.cs" />
     <Compile Include="SubtitleLanguage.cs" />
+    <Compile Include="ImdbBrowserWorker.cs" />
     <Compile Include="TorrentImdbEntry.cs" />
     <Compile Include="TorrentImdbEntryExtractor.cs" />
     <Compile Include="ImdbQueryProvider.cs" />
     <Compile Include="OpenSubtitles.cs" />
     <Compile Include="PirateRequest.cs" />
+    <Compile Include="TorrentMovieSource.cs" />
     <Compile Include="TorrentMovieFactory.cs" />
     <Compile Include="TorrentMovieCachedRepository.cs" />
     <Compile Include="ImdbMovieRepository.cs" />

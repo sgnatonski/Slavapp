@@ -9,15 +9,10 @@ namespace TorrentBrowser
     public class TorrentBrowserWorker
     {
         private readonly TorrentMovieCachedRepository _torrentRepository;
-        private readonly ImdbMovieRepository _imdbRepository;
 
-        private readonly SubtitleLanguage _subtitleLang;
-
-        public TorrentBrowserWorker(SubtitleLanguage subtitleLang)
+        public TorrentBrowserWorker()
         {
-            _subtitleLang = subtitleLang;
             _torrentRepository = new TorrentMovieCachedRepository();
-            _imdbRepository = new ImdbMovieRepository();
         }
 
         public IEnumerable<TorrentMovie> GetCache()
@@ -25,7 +20,7 @@ namespace TorrentBrowser
             return _torrentRepository.GetAll();
         }
 
-        public IObservable<TorrentMovie> Work(TorrentSite site, CancellationToken cancellationToken)
+        public IObservable<TorrentMovieSource> Work(TorrentSite site, CancellationToken cancellationToken)
         {
             var torrents = TorrentList.GetTorrents(site, cancellationToken).Result;
             var movies = torrents.Select(torrent => GetMovie(torrent, cancellationToken).Wait());
@@ -33,7 +28,7 @@ namespace TorrentBrowser
             return movies;            
         }
 
-        private IObservable<TorrentMovie> GetMovie(TorrentEntry torrent, CancellationToken cancellationToken)
+        private IObservable<TorrentMovieSource> GetMovie(TorrentEntry torrent, CancellationToken cancellationToken)
         {
             return Observable.FromAsync(async () =>
             {
@@ -41,26 +36,29 @@ namespace TorrentBrowser
                 
                 if (!imdbEntry.IsValid)
                 {
-                    return TorrentMovieFactory.CreateTorrentMovie(torrent);
+                    return new TorrentMovieSource
+                    {
+                        TorrentMovie = TorrentMovieFactory.CreateTorrentMovie(torrent),
+                        State = TorrentMovieState.Invalid
+                    };
                 }
                 
                 var cacheMovie = _torrentRepository.Get(imdbEntry.ImdbLink);
                 if (cacheMovie != null)
                 {
                     Console.WriteLine($"[from cache] {cacheMovie.Movie} IMDB rating: {cacheMovie.Rating}");
-                    return cacheMovie;
+                    return new TorrentMovieSource
+                    {
+                        TorrentMovie = cacheMovie,
+                        State = TorrentMovieState.Complete
+                    };
                 }
 
-                var imdbData = _imdbRepository.GetById(imdbEntry.ImdbId)
-                                ?? await ImdbDataExtractor.ExtractData(imdbEntry.ImdbId, cancellationToken);
-                var subtitles = await OpenSubtitles.GetSubtitles(imdbEntry.ImdbId, _subtitleLang);
-
-                var movie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry, imdbData, subtitles);
-
-                _imdbRepository.Add(imdbData);
-                _torrentRepository.Add(movie.ImdbLink, movie);
-
-                return movie;
+                return new TorrentMovieSource
+                {
+                    TorrentMovie = TorrentMovieFactory.CreateTorrentMovie(torrent, imdbEntry),
+                    State = TorrentMovieState.Incomplete
+                };
             });            
         }
     }

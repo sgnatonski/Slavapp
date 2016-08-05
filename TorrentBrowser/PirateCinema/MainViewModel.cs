@@ -50,15 +50,18 @@ namespace PirateCinema
 
             return Observable.Start(() =>
             {
-                var worker = new TorrentBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId));
+                var imdbWorker = new ImdbBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId));
+                var torrentWorker = new TorrentBrowserWorker();
 
-                var moviesSource1 = worker.Work(TorrentSiteProvider.PirateBay, _cancelToken.Token);
-                var moviesSource2 = worker.Work(TorrentSiteProvider.ExtraTorrent, _cancelToken.Token);
-                var moviesSource3 = worker.Work(TorrentSiteProvider._1337x, _cancelToken.Token);
+                var moviesSource1 = torrentWorker.Work(TorrentSiteProvider.PirateBay, _cancelToken.Token);
+                var moviesSource2 = torrentWorker.Work(TorrentSiteProvider.ExtraTorrent, _cancelToken.Token);
+                var moviesSource3 = torrentWorker.Work(TorrentSiteProvider._1337x, _cancelToken.Token);
 
-                moviesSource1
+                var torrents = moviesSource1
                     .Merge(moviesSource2)
-                    .Merge(moviesSource3)
+                    .Merge(moviesSource3);
+
+                imdbWorker.Work(torrents, _cancelToken.Token)
                     .Distinct(x => x.Id)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(movieList.List.Add, _cancelToken.Token);
@@ -67,7 +70,7 @@ namespace PirateCinema
 
         private void InitializeCachedList()
         {
-            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker(SubtitleLanguage.FromIsoName(SelectedLangId)).GetCache()));
+            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
 
             MoviesList = movies.ByRatingWithSubtitle;
         }

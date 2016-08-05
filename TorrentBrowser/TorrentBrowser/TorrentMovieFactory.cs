@@ -5,18 +5,30 @@ namespace TorrentBrowser
 {
     public static class TorrentMovieFactory
     {
-        public static TorrentMovie CreateTorrentMovie(TorrentEntry torrentEntry, TorrentImdbEntry torrentImdbEntry, ImdbData imdbData, string[] subtitles)
+        public static TorrentMovie CreateTorrentMovie(TorrentMovie movie, ImdbData imdbData, string[] subtitles)
+        {
+            return new TorrentMovie
+            {
+                Id = movie.Id,
+                TorrentLink = movie.TorrentLink,
+                ImdbLink = movie.ImdbLink,
+                PictureUrl = imdbData.PictureLink,
+                Movie = (imdbData.MovieName ?? movie.Movie).Trim(),
+                Rating = imdbData.Rating.GetValueOrDefault(),
+                Quality = movie.Quality,
+                Subtitles = subtitles,
+                LastUpdated = DateTime.Now
+            };
+        }
+
+        public static TorrentMovie CreateTorrentMovie(TorrentEntry torrentEntry, TorrentImdbEntry torrentImdbEntry)
         {
             return new TorrentMovie
             {
                 Id = torrentImdbEntry.ImdbId,
                 TorrentLink = torrentEntry.TorrentUri,
                 ImdbLink = torrentImdbEntry.ImdbLink,
-                PictureUrl = imdbData.PictureLink,
-                Movie = (imdbData.MovieName ?? torrentEntry.Title).Trim(),
-                Rating = imdbData.Rating.GetValueOrDefault(),
                 Quality = torrentEntry.Quality,
-                Subtitles = subtitles,
                 LastUpdated = DateTime.Now
             };
         }
@@ -27,7 +39,8 @@ namespace TorrentBrowser
             {
                 TorrentLink = torrentEntry.TorrentUri,
                 Movie = torrentEntry.TorrentPage.Split('/').LastOrDefault(),
-                Quality = torrentEntry.Quality
+                Quality = torrentEntry.Quality,
+                LastUpdated = DateTime.Now
             };
         }
     }
