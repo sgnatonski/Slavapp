@@ -53,7 +53,7 @@ namespace PirateCinema
 
         private void InitializeCachedList()
         {
-            var movies = MovieListFactory.Build(new ReactiveList<TorrentMovie>(new TorrentBrowserWorker().GetCache()));
+            var movies = MovieListFactory.Build(new TorrentBrowserWorker().GetCache());
 
             MoviesList = movies.ByRatingWithSubtitle;
         }

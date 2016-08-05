@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Collections.Generic;
+using ReactiveUI;
 using TorrentBrowser;
 
 namespace PirateCinema
@@ -10,9 +11,9 @@ namespace PirateCinema
             return new MovieList(new ReactiveList<TorrentMovie>());
         }
 
-        public static MovieList Build(ReactiveList<TorrentMovie> movies)
+        public static MovieList Build(IEnumerable<TorrentMovie> movies)
         {
-            return new MovieList(movies);
+            return new MovieList(new ReactiveList<TorrentMovie>(movies));
         }
     }
 }
