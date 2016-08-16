@@ -8,6 +8,8 @@ namespace TorrentBrowser
 {
     public class TorrentImdbEntry
     {
+        public int Id { get; set; }
+        public Uri TorrentLink { get; set; }
         public int ImdbId { get; set; }
         public Uri ImdbLink { get; set; }
 

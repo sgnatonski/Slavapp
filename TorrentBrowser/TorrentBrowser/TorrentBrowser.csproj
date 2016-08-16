@@ -75,6 +75,7 @@
     <Compile Include="FakeTorrentBrowserWorker.cs" />
     <Compile Include="ImdbData.cs" />
     <Compile Include="ImdbDataExtractor.cs" />
+    <Compile Include="TorrentImdbEntryRepository.cs" />
     <Compile Include="SubtitleLanguage.cs" />
     <Compile Include="ImdbBrowserWorker.cs" />
     <Compile Include="TorrentImdbEntry.cs" />

@@ -23,6 +23,7 @@ namespace TorrentBrowser
 
             return new TorrentImdbEntry
             {
+                TorrentLink = uri,
                 ImdbLink = imdbUri,
                 ImdbId = ExtractImdbId(imdbUri)
             };

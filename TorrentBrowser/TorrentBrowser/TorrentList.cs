@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -14,10 +13,9 @@ namespace TorrentBrowser
 
         public static async Task<IObservable<TorrentEntry>> GetTorrents(TorrentSite site, CancellationToken cancellationToken)
         {
-            Debug.WriteLine($"Getting {site.PageBaseUrl} torrent list");
             var document = await PirateRequest.OpenAsync(new Uri(site.ListUrl), cancellationToken);
             var entries = document.QuerySelectorAll(site.ListItemSelector)
-                .Select(c => new { Text = c.TextContent, Href = c.GetAttribute("href")?.Trim() })
+                .Select(c => new { Text = c.TextContent, Href = c.GetAttribute("href")?.Trim().TrimEnd('/') + "/" })
                 .Select(m => new TorrentEntry
                 {
                     Title = m.Text,

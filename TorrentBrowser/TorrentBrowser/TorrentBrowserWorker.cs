@@ -8,10 +8,12 @@ namespace TorrentBrowser
     public class TorrentBrowserWorker
     {
         private readonly TorrentMovieCachedRepository _torrentRepository;
+        private readonly TorrentImdbEntryRepository _torrentImdbEntryRepository;
 
         public TorrentBrowserWorker()
         {
             _torrentRepository = new TorrentMovieCachedRepository();
+            _torrentImdbEntryRepository = new TorrentImdbEntryRepository();
         }
 
         public IEnumerable<TorrentMovie> GetCache()
@@ -36,13 +38,16 @@ namespace TorrentBrowser
         {
             return Observable.FromAsync(async () =>
             {
-                var imdbEntry = await TorrentImdbEntryExtractor.ExtractImdbEntry(torrent.TorrentUri, cancellationToken);
+                var imdbEntry = _torrentImdbEntryRepository.GetById(torrent.TorrentUri)
+                    ?? await TorrentImdbEntryExtractor.ExtractImdbEntry(torrent.TorrentUri, cancellationToken);
                 
                 if (!imdbEntry.IsValid)
                 {
                     return TorrentMovieSourceFactory.CreateInvalidTorrentMovieSource(torrent);
                 }
-                
+
+                _torrentImdbEntryRepository.Add(imdbEntry);
+
                 var cacheMovie = _torrentRepository.Get(imdbEntry.ImdbLink);
                 if (cacheMovie != null)
                 {
