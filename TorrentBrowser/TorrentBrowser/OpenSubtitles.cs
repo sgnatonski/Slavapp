@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -10,20 +13,29 @@ namespace TorrentBrowser
     {
         public static async Task<string[]> GetSubtitles(int imdbid, SubtitleLanguage langid)
         {
-            return await Task.Run(() =>
+            try
             {
-                try
+                Debug.WriteLine($"Requesting http://www.opensubtitles.org/en/search/imdbid-{imdbid}/sublanguageid-{langid}/xml");
+                var rq = (HttpWebRequest)WebRequest.Create($"http://www.opensubtitles.org/en/search/imdbid-{imdbid}/sublanguageid-{langid}/xml");
+
+                rq.Timeout = 1000;
+                rq.ReadWriteTimeout = 10000;
+
+                var response = await rq.GetResponseAsync() as HttpWebResponse;
+
+                using (var responseStream = response.GetResponseStream())
                 {
-                    var osXml = XDocument.Load($"http://www.opensubtitles.org/en/search/imdbid-{imdbid}/sublanguageid-{langid}/xml", LoadOptions.None);
+                    XmlTextReader reader = new XmlTextReader(responseStream);
+                    var osXml = XDocument.Load(reader, LoadOptions.None);
                     return osXml.XPathSelectElements("//opensubtitles/search/results/subtitle/IDSubtitle").Select(x => x.Attribute("LinkDownload").Value).ToArray();
                 }
-                catch (Exception)
-                {
-                    // ignored
-                }
+            }
+            catch (Exception ex)
+            {
+                // ignored
+            }
 
-                return new string[0];
-            });
+            return new string[0];
         }
     }
 }
