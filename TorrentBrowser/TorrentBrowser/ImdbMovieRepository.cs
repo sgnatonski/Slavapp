@@ -32,14 +32,14 @@ namespace TorrentBrowser
             movie.LastUpdated = DateTime.Now;
 
             using (var db = new LiteDatabase(PCinemaDbName))
+            using (var trans = db.BeginTrans())
             {
                 var c = db.GetCollection<ImdbData>(ImdbMovieCollectionName);
-                db.BeginTrans();
                 if (!c.Update(movie))
                 {
                     c.Insert(movie);
                 }
-                db.Commit();
+                trans.Commit();
             }
         }
     }

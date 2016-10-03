@@ -28,14 +28,14 @@ namespace TorrentBrowser
         public void Add(Uri uri, TorrentMovie movie)
         {
             using (var db = new LiteDatabase(PCinemaDbName))
+            using (var trans = db.BeginTrans())
             {
                 var c = db.GetCollection<TorrentMovie>(TorrentMovieCollectionName);
-                db.BeginTrans();
                 if (!c.Update(movie))
                 {
                     c.Insert(movie);
                 }
-                db.Commit();
+                trans.Commit();
             }
         }
     }
