@@ -12,10 +12,17 @@ namespace TorrentBrowser
         public string Movie { get; set; }
         public float Rating { get; set; }
         public string Quality { get; set; }
-        public string[] Subtitles { get; set; }
+        public SubtitleData[] Subtitles { get; set; }
         public DateTime LastUpdated { get; set; }
         public bool HasImdbLink { get { return ImdbLink != null; } }
         public bool HasTorrentLink { get { return TorrentLink != null; } }
         public bool HasSubtitles { get { return Subtitles != null && Subtitles.Any(); } }
+        public bool SubtitlesMatch
+        {
+            get
+            {
+                return HasSubtitles && Subtitles.Any(s => !string.IsNullOrEmpty(s.ReleaseName) && TorrentLink.ToString().ToLower().Contains(s.ReleaseName.ToLower()));
+            }
+        }
     }
 }

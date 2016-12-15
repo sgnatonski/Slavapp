@@ -11,7 +11,7 @@ namespace TorrentBrowser
 {
     public static class OpenSubtitles
     {
-        public static async Task<string[]> GetSubtitles(int imdbid, SubtitleLanguage langid)
+        public static async Task<SubtitleData[]> GetSubtitles(int imdbid, SubtitleLanguage langid)
         {
             try
             {
@@ -27,7 +27,12 @@ namespace TorrentBrowser
                 {
                     XmlTextReader reader = new XmlTextReader(responseStream);
                     var osXml = XDocument.Load(reader, LoadOptions.None);
-                    return osXml.XPathSelectElements("//opensubtitles/search/results/subtitle/IDSubtitle").Select(x => x.Attribute("LinkDownload").Value).ToArray();
+                    var subs = osXml.XPathSelectElements("//opensubtitles/search/results/subtitle").Select(x => new SubtitleData
+                    {
+                        LinkDownload = x.Element("IDSubtitle")?.Attribute("LinkDownload")?.Value,
+                        ReleaseName = x.Element("MovieReleaseName")?.Value
+                    }).ToArray();
+                    return subs;
                 }
             }
             catch (Exception ex)
@@ -35,7 +40,7 @@ namespace TorrentBrowser
                 // ignored
             }
 
-            return new string[0];
+            return new SubtitleData[0];
         }
     }
 }

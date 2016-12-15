@@ -48,8 +48,9 @@ namespace PirateCinema
                     TorrentSiteProvider._1337x);
             }).Merge();
 
-            observable.ObserveOn(RxApp.MainThreadScheduler)
-                      .Subscribe(movieList.List.Add, _cancelToken.Token);
+            observable
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(movieList.List.Add, _cancelToken.Token);
 
             return observable;
         }

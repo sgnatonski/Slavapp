@@ -24,7 +24,19 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Padding="2" Width="260" Foreground="#FFFFFFFF" Template="{DynamicResource GlassButton}">
+                        <Button Padding="2" Width="260" Template="{DynamicResource GlassButton}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SubtitlesMatch}" Value="True">
+                                            <Setter Property="Foreground" Value="#22FF22" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SubtitlesMatch}" Value="False">
+                                            <Setter Property="Foreground" Value="LightGray" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <Grid Width="260">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>

@@ -13,7 +13,7 @@ namespace TorrentBrowser
             };
         }
 
-        public static TorrentMovieSource CreateCompleteTorrentMovieSource(TorrentMovie movie, ImdbData imdbData, string[] subtitles)
+        public static TorrentMovieSource CreateCompleteTorrentMovieSource(TorrentMovie movie, ImdbData imdbData, SubtitleData[] subtitles)
         {
             return new TorrentMovieSource
             {

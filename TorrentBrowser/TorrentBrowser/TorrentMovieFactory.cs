@@ -5,7 +5,7 @@ namespace TorrentBrowser
 {
     public static class TorrentMovieFactory
     {
-        public static TorrentMovie CreateTorrentMovie(TorrentMovie movie, ImdbData imdbData, string[] subtitles)
+        public static TorrentMovie CreateTorrentMovie(TorrentMovie movie, ImdbData imdbData, SubtitleData[] subtitles)
         {
             return new TorrentMovie
             {
