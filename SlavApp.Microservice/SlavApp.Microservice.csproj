@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6FA62888-EB0F-4AE7-98E8-B0E773BD45B2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SlavApp.Microservice</RootNamespace>
+    <AssemblyName>SlavApp.Microservice</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AsyncIO, Version=0.1.17.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
+      <HintPath>..\packages\AsyncIO.0.1.17.0\lib\net40\AsyncIO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ConcurrentPriorityQueue, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PriorityQueue.0.1.0\lib\net45\ConcurrentPriorityQueue.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetMQ, Version=3.3.2.1, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetMQ.3.3.2.1\lib\net40\NetMQ.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Dispatching\RequestDispatcher.cs" />
+    <Compile Include="Dispatching\Worker.cs" />
+    <Compile Include="Extensions\ContainerWrapperExtensions.cs" />
+    <Compile Include="IContainerWrapper.cs" />
+    <Compile Include="Microservice\MicroserviceFactory.cs" />
+    <Compile Include="Requests\HandlerFeeder.cs" />
+    <Compile Include="Requests\RequestHandlerFactory.cs" />
+    <Compile Include="Requests\ServerRequestConfiguration.cs" />
+    <Compile Include="Requests\ServerRequestManager.cs" />
+    <Compile Include="Requests\IHandleTopic.cs" />
+    <Compile Include="Requests\IRequestHandler.cs" />
+    <Compile Include="Requests\ServerTopicHeader.cs" />
+    <Compile Include="Requests\XPubXSubProxy.cs" />
+    <Compile Include="Serialization\ContextMessageSurrogate.cs" />
+    <Compile Include="Requests\RequestEndpointConfiguration.cs" />
+    <Compile Include="Log\ILogger.cs" />
+    <Compile Include="Network\IpAddressService.cs" />
+    <Compile Include="Requests\IRequestReceiver.cs" />
+    <Compile Include="Requests\RequestPublisher.cs" />
+    <Compile Include="Requests\RequestReceiver.cs" />
+    <Compile Include="Requests\TimeoutContextMessage.cs" />
+    <Compile Include="Requests\ResponseContextMessage.cs" />
+    <Compile Include="Requests\ContextMessage.cs" />
+    <Compile Include="Requests\IRequestPublisher.cs" />
+    <Compile Include="Microservice\IMicroservice.cs" />
+    <Compile Include="Microservice\IMicroserviceStatusNotifier.cs" />
+    <Compile Include="Microservice\MicroserviceRunner.cs" />
+    <Compile Include="Microservice\MicroserviceStatus.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Microservice\ServiceStatusMessage.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Log\TraceLogger.cs" />
+    <Compile Include="Serialization\PropertyMapper.cs" />
+    <Compile Include="Serialization\ProtobufConfig.cs" />
+    <Compile Include="ServiceOptions.cs" />
+    <Compile Include="ServerOptions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
